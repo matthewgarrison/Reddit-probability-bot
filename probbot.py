@@ -6,6 +6,9 @@ import time
 
 # Returns a string containing the results of the dice rolls.
 def rollDice(numDice, numSides, addor, no_breakdown) :
+	if no_breakdown : numDice = min(numDice, 1000)
+	else : numDice = min(numDice, 50)
+	numSides = min(numSides, 10000)
 	results = []
 	for i in range(numDice) :
 		results.append(random.randint(1, numSides) + addor)
@@ -22,10 +25,12 @@ def rollDice(numDice, numSides, addor, no_breakdown) :
 
 # Returns a string containing the results of the coin flips.
 def flipCoins(numCoins) :
+	numCoins = min(numCoins, 1000)
 	results = []
 	for i in range(numCoins) :
 		results.append(random.randint(0, 1))
 	return "You got " + str(results.count(0)) + " heads and " + str(results.count(1)) + " tails.\n\n"
+	
 
 # Stores the comments that have already been replied to, so we don't double comment.
 if not os.path.isfile("comments_replied_to.txt") : comments_replied_to = []
@@ -34,7 +39,6 @@ else :
 		comments_replied_to = file.read()
 		comments_replied_to = comments_replied_to.split("\n")
 		comments_replied_to = list(filter(None, comments_replied_to))
-
 
 reddit = praw.Reddit("prob-bot")
 subreddit = reddit.subreddit("test")
@@ -90,11 +94,11 @@ for comment in subreddit.comments(limit=50) :
 				[Reddit](https://www.reddit.com/user/matthew_garrison) or [GitHub](https://github.com/matthewgarrison/).\n"""
 		comment.reply(output)
 		comments_replied_to.append(comment.id)
-		time.sleep(30)
+		with open("comments_replied_to.txt", "w") as file:
+			for comment_id in comments_replied_to:
+				file.write(comment_id + "\n")
+		time.sleep(100)
 
 
-# Add the replied to comments to a file for use the next time this script is run.
-with open("comments_replied_to.txt", "w") as file:
-    for comment_id in comments_replied_to:
-    	file.write(comment_id + "\n")
+
 print("Done")
