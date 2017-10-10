@@ -1,33 +1,100 @@
+import os
+import praw
 import random
+import re
+import time
 
-# Returns a list containing the results of the dice rolls.
-def rollDice(numDice, numSides) :
+# Returns a string containing the results of the dice rolls.
+def rollDice(numDice, numSides, addor, no_breakdown) :
 	results = []
 	for i in range(numDice) :
-		results.append(random.randint(1, numSides))
-	return results
+		results.append(random.randint(1, numSides) + addor)
+	output = "You rolled " + str(sum(results)) + "."
+	if not no_breakdown and numDice != 1 :
+		output += " Breakdown: "
+		for result in results[:-1] :
+			output += str(result)
+			if addor != 0 : output += "+" + str(addor)
+			output += ", "
+		output += str(results[0])
+		if addor != 0 : output += "+" + str(addor)
+	return output + "\n\n"
 
-# Returns a list containing the results of the coin flips (Heads=1 and Tails=2).
+# Returns a string containing the results of the coin flips.
 def flipCoins(numCoins) :
 	results = []
 	for i in range(numCoins) :
 		results.append(random.randint(0, 1))
-	return results
+	return "You got " + str(results.count(0)) + " heads and " + str(results.count(1)) + " tails.\n\n"
 
-while (True) :
-	kind = input("What kind?\n")
-	if (kind == "dice") :
-		num = int(input("How many?\n"))
-		sides = int(input("Sides?\n"))
-		addor = input("Plus anything?\n")
-		results = rollDice(num, sides)
-		print("You rolled", sum(results))
-		for result in results :
-			if (addor == 0) : print(result, end=", ")
-			else : print(result, "+", addor, sep = "", end=", ")
-		print()
-	elif (kind == "coin") :
-		num = int(input("How many?\n"))
-		results = flipCoins(num)
-		print("You got", results.count(0), "heads and", results.count(1), "tails.")
-	else : print("Invalid response. Try again.")
+# Stores the comments that have already been replied to, so we don't double comment.
+if not os.path.isfile("comments_replied_to.txt") : comments_replied_to = []
+else :
+	with open("comments_replied_to.txt", "r") as file :
+		comments_replied_to = file.read()
+		comments_replied_to = comments_replied_to.split("\n")
+		comments_replied_to = list(filter(None, comments_replied_to))
+
+
+reddit = praw.Reddit("prob-bot")
+subreddit = reddit.subreddit("test")
+
+for comment in subreddit.comments(limit=50) :
+	if re.search("/u/ProbabilityBot_", comment.body) and comment.id not in comments_replied_to :
+		output = ""
+		try :
+			status = num = sides = addor = 0
+			words = comment.body.split()
+			print(comment.id, words)
+			for word in words :
+				if word == "!roll" : 
+					if status == 1 or status == 2 : output += rollDice(1, 6, 0, True)
+					elif status == 3 : output += flipCoins(1)
+					status = 1
+				if word == "!roll_nb" : 
+					if status == 1 or status == 2 : output += rollDice(1, 6, 0, True)
+					elif status == 3 : output += flipCoins(1)
+					status = 2
+				if word == "!flip" : 
+					if status == 1 or status == 2 : output += rollDice(1, 6, 0, True)
+					elif status == 3 : output += flipCoins(1)
+					status = 3
+				if (status == 1 or status == 2) and re.match("\d(d\d)*", word) :
+					parts = re.split("d|\+", word)
+					if (len(parts) == 1) :
+						num = int(parts[0])
+						sides = 6
+					elif (len(parts) == 2) :
+						num = int(parts[0])
+						sides = int(parts[1])
+					else :
+						num = int(parts[0])
+						sides = int(parts[1])
+						addor = int(parts[2])
+					output += rollDice(num, sides, addor, True if status == 2 else False)
+					status = num = sides = addor = 0
+				if status == 3 and re.match("\d", word) :
+					num = int(word)
+					output += flipCoins(num)
+					status = num = sides = addor = 0
+			if status == 1 or status == 2: output += rollDice(1, 6, 0, True)
+			elif status == 2 : output += flipCoins(1)
+			if output == "" :
+				raise Exception("Invalid syntax")
+			print("Replied to ", comment.id)
+		except :
+			output = "I'm sorry, this comment is improperly formatted or contains no commands. You can view the correct format [here]().\n"
+			print("Error on", comment.id)
+		print(output)
+		output += """\n*****\nThis bot was made by Matthew Garrison. You can view its source [here](). You can contact me on 
+				[Reddit](https://www.reddit.com/user/matthew_garrison) or [GitHub](https://github.com/matthewgarrison/).\n"""
+		comment.reply(output)
+		comments_replied_to.append(comment.id)
+		time.sleep(30)
+
+
+# Add the replied to comments to a file for use the next time this script is run.
+with open("comments_replied_to.txt", "w") as file:
+    for comment_id in comments_replied_to:
+    	file.write(comment_id + "\n")
+print("Done")
