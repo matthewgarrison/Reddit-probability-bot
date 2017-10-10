@@ -11,15 +11,15 @@ def rollDice(numDice, numSides, addor, no_breakdown) :
 	numSides = min(numSides, 10000)
 	results = []
 	for i in range(numDice) :
-		results.append(random.randint(1, numSides) + addor)
-	output = "You rolled " + str(sum(results)) + "."
+		results.append(random.randint(1, numSides))
+	output = "You rolled " + str(sum(results) + addor*numDice) + "."
 	if not no_breakdown and numDice != 1 :
 		output += " Breakdown: "
 		for result in results[:-1] :
 			output += str(result)
 			if addor != 0 : output += "+" + str(addor)
 			output += ", "
-		output += str(results[0])
+		output += str(results[len(results)-1])
 		if addor != 0 : output += "+" + str(addor)
 	return output + "\n\n"
 
