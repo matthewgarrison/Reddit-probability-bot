@@ -50,64 +50,61 @@ if RUNNING_ON_HEROKU : reddit = praw.Reddit(username=os.environ["REDDIT_USERNAME
 	client_id=os.environ["CLIENT_ID"], client_secret=os.environ["CLIENT_SECRET"], user_agent=os.environ["USER_AGENT"])
 else : reddit = praw.Reddit("prob-bot")
 
-while (True) :
-	for comment in reddit.inbox.unread(limit=None) :
-		if re.search("/u/ProbabilityBot_", comment.body) and comment.id not in comments_replied_to :
-			output = ""
-			try :
-				status = num = sides = addor = 0
-				words = comment.body.split()
-				print(comment.id, words)
-				for word in words :
-					if word == "!roll" : 
-						if status == 1 or status == 2 : output += roll_dice(1, 6, 0, True)
-						elif status == 3 : output += flip_coins(1)
-						status = 1
-					if word == "!roll_nb" : 
-						if status == 1 or status == 2 : output += roll_dice(1, 6, 0, True)
-						elif status == 3 : output += flip_coins(1)
-						status = 2
-					if word == "!flip" : 
-						if status == 1 or status == 2 : output += roll_dice(1, 6, 0, True)
-						elif status == 3 : output += flip_coins(1)
-						status = 3
-					if (status == 1 or status == 2) and re.match("\d(d\d)*", word) :
-						parts = re.split("d|\+", word)
-						if (len(parts) == 1) :
-							num = int(parts[0])
-							sides = 6
-						elif (len(parts) == 2) :
-							num = int(parts[0])
-							sides = int(parts[1])
-						else :
-							num = int(parts[0])
-							sides = int(parts[1])
-							addor = int(parts[2])
-						output += roll_dice(num, sides, addor, True if status == 2 else False)
-						status = num = sides = addor = 0
-					if status == 3 and re.match("\d", word) :
-						num = int(word)
-						output += flip_coins(num)
-						status = num = sides = addor = 0
-				if status == 1 or status == 2: output += roll_dice(1, 6, 0, True)
-				elif status == 2 : output += flip_coins(1)
-				if output == "" :
-					raise Exception("Invalid syntax")
-				print("Replied to ", comment.id)
-			except :
-				output = "I'm sorry, this comment is improperly formatted or contains no commands. You can view the correct format [here]().\n"
-				print("Error on", comment.id)
-			print(output)
-			output += """\n*****\nThis bot was made by Matthew Garrison. You can view its source [here](). You can contact me on 
-					[Reddit](https://www.reddit.com/user/matthew_garrison) or [GitHub](https://github.com/matthewgarrison/).\n"""
-			comment.reply(output)
-			comments_replied_to.append(comment.id)
-			with open("comments_replied_to.txt", "w") as file:
-				for comment_id in comments_replied_to:
-					file.write(comment_id + "\n")
-			time.sleep(100)
-	print("Done with loop")
-	time.sleep(500)
+for comment in reddit.inbox.unread(limit=None) :
+	if re.search("/u/ProbabilityBot_", comment.body) and comment.id not in comments_replied_to :
+		output = ""
+		try :
+			status = num = sides = addor = 0
+			words = comment.body.split()
+			print(comment.id, words)
+			for word in words :
+				if word == "!roll" : 
+					if status == 1 or status == 2 : output += roll_dice(1, 6, 0, True)
+					elif status == 3 : output += flip_coins(1)
+					status = 1
+				if word == "!roll_nb" : 
+					if status == 1 or status == 2 : output += roll_dice(1, 6, 0, True)
+					elif status == 3 : output += flip_coins(1)
+					status = 2
+				if word == "!flip" : 
+					if status == 1 or status == 2 : output += roll_dice(1, 6, 0, True)
+					elif status == 3 : output += flip_coins(1)
+					status = 3
+				if (status == 1 or status == 2) and re.match("\d(d\d)*", word) :
+					parts = re.split("d|\+", word)
+					if (len(parts) == 1) :
+						num = int(parts[0])
+						sides = 6
+					elif (len(parts) == 2) :
+						num = int(parts[0])
+						sides = int(parts[1])
+					else :
+						num = int(parts[0])
+						sides = int(parts[1])
+						addor = int(parts[2])
+					output += roll_dice(num, sides, addor, True if status == 2 else False)
+					status = num = sides = addor = 0
+				if status == 3 and re.match("\d", word) :
+					num = int(word)
+					output += flip_coins(num)
+					status = num = sides = addor = 0
+			if status == 1 or status == 2: output += roll_dice(1, 6, 0, True)
+			elif status == 2 : output += flip_coins(1)
+			if output == "" :
+				raise Exception("Invalid syntax")
+			print("Replied to ", comment.id)
+		except :
+			output = "I'm sorry, this comment is improperly formatted or contains no commands. You can view the correct format [here]().\n"
+			print("Error on", comment.id)
+		print(output)
+		output += """\n*****\nThis bot was made by Matthew Garrison. You can view its source [here](). You can contact me on 
+				[Reddit](https://www.reddit.com/user/matthew_garrison) or [GitHub](https://github.com/matthewgarrison/).\n"""
+		comment.reply(output)
+		comments_replied_to.append(comment.id)
+		with open("comments_replied_to.txt", "w") as file:
+			for comment_id in comments_replied_to:
+				file.write(comment_id + "\n")
+		time.sleep(100)
 
 
 
