@@ -53,42 +53,37 @@ for comment in reddit.inbox.unread(limit=None) :
 	if re.search("/u/ProbabilityBot_", comment.body) and comment.id not in comments_replied_to :
 		output = ""
 		try :
-			status = num = sides = addor = 0
-			words = re.split("[^a-zA-Z0-9\!\+]+", comment.body)
-			print(comment.id, words)
-			for word in words :
-				if word == "!roll" : 
-					if status == 1 or status == 2 : output += roll_dice(1, 6, 0, True)
-					elif status == 3 : output += flip_coins(1)
-					status = 1
-				if word == "!roll_nb" : 
-					if status == 1 or status == 2 : output += roll_dice(1, 6, 0, True)
-					elif status == 3 : output += flip_coins(1)
-					status = 2
-				if word == "!flip" : 
-					if status == 1 or status == 2 : output += roll_dice(1, 6, 0, True)
-					elif status == 3 : output += flip_coins(1)
-					status = 3
-				if (status == 1 or status == 2) and re.match("\d(d\d)*", word) :
-					parts = re.split("d|\+", word)
-					if (len(parts) == 1) :
-						num = int(parts[0])
+			lines = comment.body.splitlines()
+			for line in lines :
+				words = re.split("[^a-zA-Z0-9\!\+_]+", line)
+				print(comment.id, words)
+				i = 0
+				while i < len(words)-1 :
+					if words[i] == "!roll" or words[i] == "!roll_nb" : 
+						no_breakdown = (words[i] == "!roll_nb")
+						num = 1
 						sides = 6
-					elif (len(parts) == 2) :
-						num = int(parts[0])
-						sides = int(parts[1])
-					else :
-						num = int(parts[0])
-						sides = int(parts[1])
-						addor = int(parts[2])
-					output += roll_dice(num, sides, addor, True if status == 2 else False)
-					status = num = sides = addor = 0
-				if status == 3 and re.match("\d", word) :
-					num = int(word)
-					output += flip_coins(num)
-					status = num = sides = addor = 0
-			if status == 1 or status == 2 : output += roll_dice(1, 6, 0, True)
-			elif status == 3 : output += flip_coins(1)
+						addor = 0
+						if re.match("\d(d\d)*", words[i+1]) :
+							parts = re.split("d|\+", words[i+1])
+							if (len(parts) == 1) :
+								num = int(parts[0])
+								sides = 6
+							elif (len(parts) == 2) :
+								num = int(parts[0])
+								sides = int(parts[1])
+							else :
+								num = int(parts[0])
+								sides = int(parts[1])
+								addor = int(parts[2])
+						output += roll_dice(num, sides, addor, no_breakdown)
+					if words[i] == "!flip" : 
+						num = 1
+						if re.match("\d", words[i+1]) : num = int(words[i+1])
+						output += flip_coins(num)
+					i += 1
+				if words[-1] == "!roll" or words[-1] == "!roll_nb" : output += roll_dice(1, 6, 0, True)
+				elif words[-1] == "!flip" : output += flip_coins(1)
 			if output == "" :
 				raise Exception("Invalid syntax")
 			print("Replied to ", comment.id)
