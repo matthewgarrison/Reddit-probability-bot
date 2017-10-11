@@ -88,7 +88,8 @@ for comment in reddit.inbox.unread(limit=None) :
 				raise Exception("Invalid syntax")
 			print("Replied to ", comment.id)
 		except :
-			output = "I'm sorry, this comment is improperly formatted or contains no commands. You can view the correct format [here]().\n"
+			output = """I'm sorry, this comment is improperly formatted or contains no commands. You can view the correct format 
+					[here](https://github.com/matthewgarrison/Reddit-probability-bot#usage).\n"""
 			print("Error on", comment.id)
 		print(output)
 		output += """\n*****\nThis bot was made by Matthew Garrison. You can view its source 
