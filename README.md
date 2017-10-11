@@ -12,7 +12,7 @@ You must first call the bot with `/u/ProbabilityBot_`, and then use one of (or m
 
 * `!roll AdB+C`: Rolls a die with `B` sides and adds `C` to the roll, `A` times, and returns the total, as well as the breakdown of what you rolled (if more than one die was rolled). `A` is capped at 50 and `B` is capped at 10000 (`C` has no cap).
 
-* `roll_nn`: The same as `!roll_nb`.
+* `roll_nb`: The same as `!roll`.
 
 * `!roll_nb AdB`: The same as `!roll AdB`, except no breakdown of your rolls is provided and `A` is capped at 1000.
 
@@ -28,21 +28,13 @@ Commenting:
 
 ```
 /u/ProbabilityBot_
-
 !roll
-
 !roll 5d6
-
 !roll 12d10+3
-
 !roll_nb
-
 !roll_nb 500d1303
-
 !roll_nb 343d343+434
-
 !flip
-
 !flip 123
 ```
 
