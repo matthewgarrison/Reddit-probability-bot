@@ -37,20 +37,12 @@ RUNNING_ON_HEROKU = False
 if len(sys.argv) > 1 :
 	if sys.argv[1] == "T" : RUNNING_ON_HEROKU = True
 
-# Stores the comments that have already been replied to, so we don't double comment.
-if not os.path.isfile("comments_replied_to.txt") : comments_replied_to = []
-else :
-	with open("comments_replied_to.txt", "r") as file :
-		comments_replied_to = file.read()
-		comments_replied_to = comments_replied_to.split("\n")
-		comments_replied_to = list(filter(None, comments_replied_to))
-
 if RUNNING_ON_HEROKU : reddit = praw.Reddit(username=os.environ["REDDIT_USERNAME"], password=os.environ["REDDIT_PASSWORD"], 
 	client_id=os.environ["CLIENT_ID"], client_secret=os.environ["CLIENT_SECRET"], user_agent=os.environ["USER_AGENT"])
 else : reddit = praw.Reddit("prob-bot")
 
 for comment in reddit.inbox.unread(limit=None) :
-	if re.search("/u/ProbabilityBot_", comment.body) and comment.id not in comments_replied_to :
+	if re.search("/u/ProbabilityBot_", comment.body) :
 		output = ""
 		try :
 			lines = comment.body.splitlines()
@@ -98,10 +90,6 @@ for comment in reddit.inbox.unread(limit=None) :
 				[Reddit](https://www.reddit.com/user/matthew_garrison) or [""" + github + "](https://github.com/matthewgarrison/).\n"
 		comment.reply(output)
 		comment.mark_read()
-		comments_replied_to.append(comment.id)
-		with open("comments_replied_to.txt", "w") as file:
-			for comment_id in comments_replied_to:
-				file.write(comment_id + "\n")
 		time.sleep(100)
 print("done")
 
