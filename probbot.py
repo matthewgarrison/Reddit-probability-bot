@@ -31,7 +31,10 @@ def flip_coins(num_coins) :
 	results = []
 	for i in range(num_coins) :
 		results.append(random.randint(0, 1))
-	return "You got " + str(results.count(0)) + " heads and " + str(results.count(1)) + " tails.\n\n"
+	if num_coins == 1 :
+		ans = ("heads" if results[0] == 0 else "tails")
+		return "You got " + ans + ".\n\n"
+	else : return "You got " + str(results.count(0)) + " heads and " + str(results.count(1)) + " tails.\n\n"
 	
 RUNNING_ON_HEROKU = False
 if len(sys.argv) > 1 :
