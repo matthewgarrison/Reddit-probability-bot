@@ -7,9 +7,9 @@ import time
 
 # Returns a string containing the results of the dice rolls.
 def roll_dice(num_dice, num_sides, addor, no_breakdown) :
-	if no_breakdown : num_dice = min(num_dice, 1000)
-	else : num_dice = min(num_dice, 50)
-	num_sides = min(num_sides, 10000)
+	if no_breakdown : num_dice = max(min(num_dice, 1000), 1)
+	else : num_dice = max(min(num_dice, 50), 1)
+	num_sides = max(min(num_sides, 10000), 2)
 	results = []
 	for i in range(num_dice) :
 		results.append(random.randint(1, num_sides))
@@ -27,7 +27,7 @@ def roll_dice(num_dice, num_sides, addor, no_breakdown) :
 
 # Returns a string containing the results of the coin flips.
 def flip_coins(num_coins) :
-	num_coins = min(num_coins, 1000)
+	num_coins = max(min(num_coins, 1000), 1)
 	results = []
 	for i in range(num_coins) :
 		results.append(random.randint(0, 1))
