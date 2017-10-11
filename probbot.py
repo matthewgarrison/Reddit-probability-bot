@@ -55,7 +55,7 @@ for comment in reddit.inbox.unread(limit=None) :
 		try :
 			lines = comment.body.splitlines()
 			for line in lines :
-				words = re.split("[^a-zA-Z0-9\!\+_]+", line)
+				words = re.split("[^a-zA-Z0-9\!\+_\-]+", line)
 				print(comment.id, words)
 				i = 0
 				while i < len(words)-1 :
