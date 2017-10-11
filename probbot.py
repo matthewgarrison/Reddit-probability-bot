@@ -5,15 +5,15 @@ import re
 import time
 
 # Returns a string containing the results of the dice rolls.
-def rollDice(numDice, numSides, addor, no_breakdown) :
-	if no_breakdown : numDice = min(numDice, 1000)
-	else : numDice = min(numDice, 50)
-	numSides = min(numSides, 10000)
+def roll_dice(num_dice, num_sides, addor, no_breakdown) :
+	if no_breakdown : num_dice = min(num_dice, 1000)
+	else : num_dice = min(num_dice, 50)
+	num_sides = min(num_sides, 10000)
 	results = []
-	for i in range(numDice) :
-		results.append(random.randint(1, numSides))
-	output = "You rolled " + str(sum(results) + addor*numDice) + "."
-	if not no_breakdown and numDice != 1 :
+	for i in range(num_dice) :
+		results.append(random.randint(1, num_sides))
+	output = "You rolled " + str(sum(results) + addor*num_dice) + "."
+	if not no_breakdown and num_dice != 1 :
 		output += " Breakdown: "
 		for result in results[:-1] :
 			output += str(result)
@@ -24,10 +24,10 @@ def rollDice(numDice, numSides, addor, no_breakdown) :
 	return output + "\n\n"
 
 # Returns a string containing the results of the coin flips.
-def flipCoins(numCoins) :
-	numCoins = min(numCoins, 1000)
+def flip_coins(num_coins) :
+	num_coins = min(num_coins, 1000)
 	results = []
-	for i in range(numCoins) :
+	for i in range(num_coins) :
 		results.append(random.randint(0, 1))
 	return "You got " + str(results.count(0)) + " heads and " + str(results.count(1)) + " tails.\n\n"
 	
@@ -51,16 +51,16 @@ for comment in reddit.inbox.unread(limit=None) :
 			print(comment.id, words)
 			for word in words :
 				if word == "!roll" : 
-					if status == 1 or status == 2 : output += rollDice(1, 6, 0, True)
-					elif status == 3 : output += flipCoins(1)
+					if status == 1 or status == 2 : output += roll_dice(1, 6, 0, True)
+					elif status == 3 : output += flip_coins(1)
 					status = 1
 				if word == "!roll_nb" : 
-					if status == 1 or status == 2 : output += rollDice(1, 6, 0, True)
-					elif status == 3 : output += flipCoins(1)
+					if status == 1 or status == 2 : output += roll_dice(1, 6, 0, True)
+					elif status == 3 : output += flip_coins(1)
 					status = 2
 				if word == "!flip" : 
-					if status == 1 or status == 2 : output += rollDice(1, 6, 0, True)
-					elif status == 3 : output += flipCoins(1)
+					if status == 1 or status == 2 : output += roll_dice(1, 6, 0, True)
+					elif status == 3 : output += flip_coins(1)
 					status = 3
 				if (status == 1 or status == 2) and re.match("\d(d\d)*", word) :
 					parts = re.split("d|\+", word)
@@ -74,14 +74,14 @@ for comment in reddit.inbox.unread(limit=None) :
 						num = int(parts[0])
 						sides = int(parts[1])
 						addor = int(parts[2])
-					output += rollDice(num, sides, addor, True if status == 2 else False)
+					output += roll_dice(num, sides, addor, True if status == 2 else False)
 					status = num = sides = addor = 0
 				if status == 3 and re.match("\d", word) :
 					num = int(word)
-					output += flipCoins(num)
+					output += flip_coins(num)
 					status = num = sides = addor = 0
-			if status == 1 or status == 2: output += rollDice(1, 6, 0, True)
-			elif status == 2 : output += flipCoins(1)
+			if status == 1 or status == 2: output += roll_dice(1, 6, 0, True)
+			elif status == 2 : output += flip_coins(1)
 			if output == "" :
 				raise Exception("Invalid syntax")
 			print("Replied to ", comment.id)
