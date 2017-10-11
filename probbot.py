@@ -5,8 +5,6 @@ import re
 import sys
 import time
 
-RUNNING_ON_HEROKU = False
-
 # Returns a string containing the results of the dice rolls.
 def roll_dice(num_dice, num_sides, addor, no_breakdown) :
 	if no_breakdown : num_dice = min(num_dice, 1000)
@@ -35,6 +33,7 @@ def flip_coins(num_coins) :
 		results.append(random.randint(0, 1))
 	return "You got " + str(results.count(0)) + " heads and " + str(results.count(1)) + " tails.\n\n"
 	
+RUNNING_ON_HEROKU = False
 if len(sys.argv) > 1 :
 	if sys.argv[1] == "T" : RUNNING_ON_HEROKU = True
 
@@ -97,7 +96,8 @@ for comment in reddit.inbox.unread(limit=None) :
 			output = "I'm sorry, this comment is improperly formatted or contains no commands. You can view the correct format [here]().\n"
 			print("Error on", comment.id)
 		print(output)
-		output += """\n*****\nThis bot was made by Matthew Garrison. You can view its source [here](). You can contact me on 
+		output += """\n*****\nThis bot was made by Matthew Garrison. You can view its source 
+				[here](https://github.com/matthewgarrison/Reddit-probability-bot). You can contact me on 
 				[Reddit](https://www.reddit.com/user/matthew_garrison) or [GitHub](https://github.com/matthewgarrison/).\n"""
 		comment.reply(output)
 		comments_replied_to.append(comment.id)
