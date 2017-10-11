@@ -49,7 +49,7 @@ if RUNNING_ON_HEROKU : reddit = praw.Reddit(username=os.environ["REDDIT_USERNAME
 	client_id=os.environ["CLIENT_ID"], client_secret=os.environ["CLIENT_SECRET"], user_agent=os.environ["USER_AGENT"])
 else : reddit = praw.Reddit("prob-bot")
 
-for comment in reddit.inbox.unread(limit=None) :
+for comment in reddit.inbox.unread(True, limit=None) :
 	if re.search("/u/ProbabilityBot_", comment.body) and comment.id not in comments_replied_to :
 		output = ""
 		try :
