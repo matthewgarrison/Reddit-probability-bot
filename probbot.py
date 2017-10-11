@@ -41,9 +41,8 @@ else :
 		comments_replied_to = list(filter(None, comments_replied_to))
 
 reddit = praw.Reddit("prob-bot")
-subreddit = reddit.subreddit("test")
 
-for comment in subreddit.comments(limit=50) :
+for comment in reddit.inbox.unread(limit=None) :
 	if re.search("/u/ProbabilityBot_", comment.body) and comment.id not in comments_replied_to :
 		output = ""
 		try :
