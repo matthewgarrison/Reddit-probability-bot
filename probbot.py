@@ -49,12 +49,12 @@ if RUNNING_ON_HEROKU : reddit = praw.Reddit(username=os.environ["REDDIT_USERNAME
 	client_id=os.environ["CLIENT_ID"], client_secret=os.environ["CLIENT_SECRET"], user_agent=os.environ["USER_AGENT"])
 else : reddit = praw.Reddit("prob-bot")
 
-for comment in reddit.inbox.unread(True, limit=None) :
+for comment in reddit.inbox.unread(limit=None) :
 	if re.search("/u/ProbabilityBot_", comment.body) and comment.id not in comments_replied_to :
 		output = ""
 		try :
 			status = num = sides = addor = 0
-			words = comment.body.split()
+			words = re.split("[^a-zA-Z0-9\!\+]+", comment.body)
 			print(comment.id, words)
 			for word in words :
 				if word == "!roll" : 
@@ -87,8 +87,8 @@ for comment in reddit.inbox.unread(True, limit=None) :
 					num = int(word)
 					output += flip_coins(num)
 					status = num = sides = addor = 0
-			if status == 1 or status == 2: output += roll_dice(1, 6, 0, True)
-			elif status == 2 : output += flip_coins(1)
+			if status == 1 or status == 2 : output += roll_dice(1, 6, 0, True)
+			elif status == 3 : output += flip_coins(1)
 			if output == "" :
 				raise Exception("Invalid syntax")
 			print("Replied to ", comment.id)
@@ -100,11 +100,12 @@ for comment in reddit.inbox.unread(True, limit=None) :
 				[here](https://github.com/matthewgarrison/Reddit-probability-bot). You can contact me on 
 				[Reddit](https://www.reddit.com/user/matthew_garrison) or [GitHub](https://github.com/matthewgarrison/).\n"""
 		comment.reply(output)
+		comment.mark_read()
 		comments_replied_to.append(comment.id)
 		with open("comments_replied_to.txt", "w") as file:
 			for comment_id in comments_replied_to:
 				file.write(comment_id + "\n")
 		time.sleep(100)
-
+print("done")
 
 
