@@ -2,7 +2,10 @@ import os
 import praw
 import random
 import re
+import sys
 import time
+
+RUNNING_ON_HEROKU = False
 
 # Returns a string containing the results of the dice rolls.
 def roll_dice(num_dice, num_sides, addor, no_breakdown) :
@@ -32,6 +35,8 @@ def flip_coins(num_coins) :
 		results.append(random.randint(0, 1))
 	return "You got " + str(results.count(0)) + " heads and " + str(results.count(1)) + " tails.\n\n"
 	
+if len(sys.argv) > 1 :
+	if sys.argv[1] == "T" : RUNNING_ON_HEROKU = True
 
 # Stores the comments that have already been replied to, so we don't double comment.
 if not os.path.isfile("comments_replied_to.txt") : comments_replied_to = []
@@ -41,7 +46,9 @@ else :
 		comments_replied_to = comments_replied_to.split("\n")
 		comments_replied_to = list(filter(None, comments_replied_to))
 
-reddit = praw.Reddit("prob-bot")
+if RUNNING_ON_HEROKU : reddit = praw.Reddit(username=os.environ["REDDIT_USERNAME"], password=os.environ["REDDIT_PASSWORD"], 
+	client_id=os.environ["CLIENT_ID"], client_secret=os.environ["CLIENT_SECRET"], user_agent=os.environ["USER_AGENT"])
+else : reddit = praw.Reddit("prob-bot")
 
 while (True) :
 	for comment in reddit.inbox.unread(limit=None) :
