@@ -1,9 +1,29 @@
+import math
 import os
 import praw
 import random
 import re
 import sys
 import time
+
+# Approximates PI using the fact that the probability of two random numbers being comprime is 6/PI^2.
+# Source: http://www.cut-the-knot.org/m/Probability/TwoCoprime.shtml
+def calc_pi(num_iterations) :
+	num_iterations = max(min(num_iterations, 100000), 100)
+	num_coprime = 0
+	for i in range(num_iterations) :
+		one = random.randrange(10000000)
+		two = random.randrange(10000000)
+		if GCD(one, two) == 1 : num_coprime += 1
+	print(num_coprime)
+	prob_comprime = num_coprime / num_iterations
+	pi = math.sqrt(6 / prob_comprime)
+	return "With " + str(num_iterations) + " interations, I approximated PI as " + str(pi) + "."
+
+# Calcualtes the GCD of two numbers.
+def GCD(a, b) :
+	if a < b : return GCD(b, a)
+	return a if b == 0 else GCD(b, a % b)
 
 # Returns a string containing the results of the dice rolls.
 def roll_dice(num_dice, num_sides, addor, no_breakdown) :
