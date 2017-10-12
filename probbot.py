@@ -44,7 +44,17 @@ if RUNNING_ON_HEROKU : reddit = praw.Reddit(username=os.environ["REDDIT_USERNAME
 	client_id=os.environ["CLIENT_ID"], client_secret=os.environ["CLIENT_SECRET"], user_agent=os.environ["USER_AGENT"])
 else : reddit = praw.Reddit("prob-bot")
 
+# Subreddits that do not like bots, that this bot will not post in.
+with open("banned_subreddits.txt", "r") as file :
+	banned_subreddits = file.read()
+	banned_subreddits = banned_subreddits.split("\n")
+	banned_subreddits = list(filter(None, banned_subreddits))
+
 for comment in reddit.inbox.unread(limit=None) :
+	subreddit = str(comment.subreddit)
+	if subreddit in banned_subreddits :
+		comment.mark_read()
+		continue
 	if re.search("/u/ProbabilityBot_", comment.body) :
 		output = ""
 		try :
