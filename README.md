@@ -20,7 +20,11 @@ You must first call the bot with `/u/ProbabilityBot_`, and then use one of (or m
 
 * `!flip`: Flips a single coin.
 
-* `!flip N` Flips `N` coins.
+* `!flip N`: Flips `N` coins.
+
+* `!pi`: Approximates PI with 1000 iterations.
+
+* `!pi N`: Approximates PI with `N` iterations (min is 100 iterations and max is 100000).
 
 ## Examples
 
@@ -50,3 +54,7 @@ You rolled 205463.
 You got 0 heads and 1 tails.
 You got 69 heads and 54 tails.
 ```
+
+## How am I approximating PI?
+
+The probability of two random numbers being coprime is 6/PI^2. Therefore, if we generate N random numbers, count how many of them are coprime, and do a little math, we can approximate PI. Cool, huh?
