@@ -18,7 +18,7 @@ def calc_pi(num_iterations) :
 	print(num_coprime)
 	prob_comprime = num_coprime / num_iterations
 	pi = math.sqrt(6 / prob_comprime)
-	return "With " + str(num_iterations) + " interations, I approximated PI as " + str(pi) + "."
+	return "With " + str(num_iterations) + " interations, I approximated PI as " + str(pi) + ".\n\n"
 
 # Calcualtes the GCD of two numbers.
 def GCD(a, b) :
@@ -106,9 +106,14 @@ for comment in reddit.inbox.unread(limit=None) :
 						num = 1
 						if re.match("\d", words[i+1]) : num = int(words[i+1])
 						output += flip_coins(num)
+					if words[i] == "!pi" :
+						num = 1000
+						if re.match("\d", words[i+1]) : num = int(words[i+1])
+						output += calc_pi(num)
 					i += 1
 				if words[-1] == "!roll" or words[-1] == "!roll_nb" : output += roll_dice(1, 6, 0, True)
 				elif words[-1] == "!flip" : output += flip_coins(1)
+				elif words[-1] == "!pi" : output += calc_pi(1000)
 			if output == "" :
 				raise Exception("Invalid syntax")
 			print("Replied to ", comment.id)
