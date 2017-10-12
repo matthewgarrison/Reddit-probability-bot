@@ -1,4 +1,4 @@
-# Reddit-probability-bot
+# Reddit Probability Bot
 
 A bot built in Python that performs basic probability tasks, such as rolling dice or flipping coins.
 
