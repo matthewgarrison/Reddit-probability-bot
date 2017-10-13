@@ -128,7 +128,7 @@ for comment in reddit.inbox.unread(limit=None) :
 				[Reddit](https://www.reddit.com/user/matthew_garrison) or [""" + github + "](https://github.com/matthewgarrison/).\n"
 		comment.reply(output)
 		comment.mark_read()
-		time.sleep(100)
+		time.sleep(20)
 print("done")
 
 
