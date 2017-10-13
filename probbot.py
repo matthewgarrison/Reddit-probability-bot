@@ -18,7 +18,7 @@ def calc_pi(num_iterations) :
 	print(num_coprime)
 	prob_comprime = num_coprime / num_iterations
 	pi = math.sqrt(6 / prob_comprime)
-	return "With " + str(num_iterations) + " interations, I approximated PI as " + str(pi) + ".\n\n"
+	return "With " + str(num_iterations) + " iterations, I approximated PI as " + str(pi) + ".\n\n"
 
 # Calcualtes the GCD of two numbers.
 def GCD(a, b) :
