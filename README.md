@@ -28,7 +28,7 @@ You must first call the bot with `/u/ProbabilityBot_`, and then use one of (or m
 
 ## Examples
 
-Commenting: 
+If you commented: 
 
 ```
 /u/ProbabilityBot_
@@ -40,9 +40,11 @@ Commenting:
 !roll_nb 343d343+434
 !flip
 !flip 123
+!pi
+!pi 12345
 ```
 
-Would result in a reply of:
+You would get a reply like:
 
 ```
 You rolled 5.
@@ -53,6 +55,8 @@ You rolled 317155.
 You rolled 205463.
 You got 0 heads and 1 tails.
 You got 69 heads and 54 tails.
+With 1000 iterations, I approximated PI as 3.115884764248779.
+With 12345 iterations, I approximated PI as 3.1375942388485325.
 ```
 
 ## How am I approximating PI?
