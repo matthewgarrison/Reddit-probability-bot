@@ -10,7 +10,7 @@ You must first call the bot with `/u/ProbabilityBot_`, and then use one of (or m
 
 * `!roll AdB`: Rolls a die with `B` sides, `A` times, and returns the total, as well as the breakdown of what you rolled (if more than one die was rolled). `A` is capped at 50 and `B` is capped at 10000.
 
-* `!roll AdB+C`: Rolls a die with `B` sides and adds `C` to the roll, `A` times, and returns the total, as well as the breakdown of what you rolled (if more than one die was rolled). `A` is capped at 50 and `B` is capped at 10000 (`C` has no cap).
+* `!roll AdB+C`: Rolls a die with `B` sides and adds `C` to the roll, `A` times, and returns the total, as well as the breakdown of what you rolled (if more than one die was rolled). `A` is capped at 50 and `B` is capped at 10000 (`C` has no cap, and can be negative).
 
 * `roll_nb`: The same as `!roll`.
 
@@ -33,13 +33,17 @@ If you commented:
 ```
 /u/ProbabilityBot_
 !roll
-!roll 5d6
-!roll 12d10+3
+!roll 12
+!roll 7d8
+!roll 4d9+10
+!roll 6d4+-2
 !roll_nb
-!roll_nb 500d1303
-!roll_nb 343d343+434
+!roll_nb 15
+!roll_nb 9d4
+!roll_nb 15d5+6
+!roll_nb 12d6+-3
 !flip
-!flip 123
+!flip 20
 !pi
 !pi 12345
 ```
@@ -47,16 +51,20 @@ If you commented:
 You would get a reply like:
 
 ```
-You rolled 5.
-You rolled 21. Breakdown: 6, 4, 5, 2, 4.
-You rolled 101. Breakdown: 3+3, 7+3, 7+3, 10+3, 1+3, 5+3, 4+3, 6+3, 7+3, 9+3, 4+3, 2+3.
-You rolled 1.
-You rolled 317155.
-You rolled 205463.
-You got 0 heads and 1 tails.
-You got 69 heads and 54 tails.
-With 1000 iterations, I approximated PI as 3.115884764248779.
-With 12345 iterations, I approximated PI as 3.1375942388485325.
+You rolled 3.
+You rolled 50. Breakdown: 4, 4, 1, 6, 6, 1, 6, 6, 2, 5, 5, 4.
+You rolled 41. Breakdown: 6, 6, 5, 8, 6, 2, 8.
+You rolled 52. Breakdown: 8+10, 1+10, 1+10, 2+10.
+You rolled 2. Breakdown: 2+-2, 1+-2, 3+-2, 3+-2, 3+-2, 2+-2.
+You rolled 6.
+You rolled 67.
+You rolled 17.
+You rolled 134.
+You rolled 2.
+You got heads.
+You got 10 heads and 10 tails.
+With 1000 iterations, I approximated PI as 3.1570203370643455.
+With 12345 iterations, I approximated PI as 3.1472297068205846.
 ```
 
 ## How am I approximating PI?
