@@ -20,7 +20,7 @@ def calc_pi(num_iterations) :
 	pi = math.sqrt(6 / prob_comprime)
 	return "With " + str(num_iterations) + " iterations, I approximated PI as " + str(pi) + ".\n\n"
 
-# Calcualtes the GCD of two numbers.
+# Calcualtes the GCD of two numbers (using the Euclidean Algorithm).
 def GCD(a, b) :
 	if a < b : return GCD(b, a)
 	return a if b == 0 else GCD(b, a % b)
@@ -56,15 +56,19 @@ def flip_coins(num_coins) :
 		return "You got " + ans + ".\n\n"
 	else : return "You got " + str(results.count(0)) + " heads and " + str(results.count(1)) + " tails.\n\n"
 	
+
+
+# Pass in "T" as a CLI argument to indicate that this script is running on Heroku.
 RUNNING_ON_HEROKU = False
 if len(sys.argv) > 1 :
 	if sys.argv[1] == "T" : RUNNING_ON_HEROKU = True
 
-if RUNNING_ON_HEROKU : reddit = praw.Reddit(username=os.environ["REDDIT_USERNAME"], password=os.environ["REDDIT_PASSWORD"], 
-	client_id=os.environ["CLIENT_ID"], client_secret=os.environ["CLIENT_SECRET"], user_agent=os.environ["USER_AGENT"])
+if RUNNING_ON_HEROKU : reddit = praw.Reddit(username=os.environ["REDDIT_USERNAME"], 
+	password=os.environ["REDDIT_PASSWORD"], client_id=os.environ["CLIENT_ID"], 
+	client_secret=os.environ["CLIENT_SECRET"], user_agent=os.environ["USER_AGENT"])
 else : reddit = praw.Reddit("prob-bot")
 
-# Subreddits that do not like bots, that this bot will not post in.
+# Subreddits that do not like bots, that this bot will not comment in.
 with open("banned_subreddits.txt", "r") as file :
 	banned_subreddits = file.read()
 	banned_subreddits = banned_subreddits.split("\n")
@@ -80,6 +84,8 @@ for comment in reddit.inbox.unread(limit=None) :
 		try :
 			lines = comment.body.splitlines()
 			for line in lines :
+				# For each word in the line, we check if it matches one of the commands. If it does, 
+				# we also check the next word in case it contains a number.
 				words = re.split("[^a-zA-Z0-9\!\+_\-]+", line)
 				print(comment.id, words)
 				i = 0
@@ -118,14 +124,16 @@ for comment in reddit.inbox.unread(limit=None) :
 				raise Exception("Invalid syntax")
 			print("Replied to ", comment.id)
 		except :
-			output = """I'm sorry, this comment is improperly formatted or contains no commands. You can view the correct format 
-					[here](https://github.com/matthewgarrison/Reddit-probability-bot#usage).\n"""
+			output = """I'm sorry, this comment is improperly formatted or contains no commands. You can 
+					view the correct format [here](https://github.com/matthewgarrison/Reddit-probability-
+					bot#usage).\n"""
 			print("Error on", comment.id)
 		print(output)
 		github = ("GitHub" if RUNNING_ON_HEROKU else "Github")
 		output += """\n*****\nThis bot was made by Matthew Garrison. You can view its source 
 				[here](https://github.com/matthewgarrison/Reddit-probability-bot). You can contact me on 
-				[Reddit](https://www.reddit.com/user/matthew_garrison) or [""" + github + "](https://github.com/matthewgarrison/).\n"
+				[Reddit](https://www.reddit.com/user/matthew_garrison) or [""" + github + 
+				"](https://github.com/matthewgarrison/).\n"
 		comment.reply(output)
 		comment.mark_read()
 		time.sleep(20)
