@@ -1,10 +1,10 @@
 # Reddit Probability Bot
 
-A bot built in Python that performs basic probability tasks, such as rolling dice or flipping coins.
+A bot built in Python that performs basic probability tasks, such as rolling dice or flipping coins. You can view the bot [here](https://www.reddit.com/user/ProbabilityBot_).
 
 ## Usage
 
-You must first call the bot with `/u/ProbabilityBot_`, and then use one of (or multiple) the following commands:
+You must first call the bot with `/u/ProbabilityBot_`, and then use one (or multiple) of the following commands:
 
 * `!roll`: Rolls a single, six-sided die.
 
@@ -69,4 +69,4 @@ With 12345 iterations, I approximated PI as 3.1472297068205846.
 
 ## How am I approximating PI?
 
-The probability of two random numbers being coprime is 6/PI^2. Therefore, if we generate N random numbers, count how many of them are coprime, and do a little math, we can approximate PI. Cool, huh?
+The probability of two random numbers being coprime is 6 / (PI^2). Therefore, if we generate N random numbers, count how many of them are coprime, and do a little math, we can approximate PI. Cool, huh?)
