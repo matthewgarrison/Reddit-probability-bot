@@ -130,10 +130,10 @@ for comment in reddit.inbox.unread(limit=None) :
 			print("Error on", comment.id)
 		print(output)
 		github = ("GitHub" if RUNNING_ON_HEROKU else "Github")
-		output += """\n*****\nThis bot was made by Matthew Garrison. You can view its source 
+		output += ("""\n*****\nThis bot was made by Matthew Garrison. You can view its source 
 				[here](https://github.com/matthewgarrison/Reddit-probability-bot). You can contact me on 
 				[Reddit](https://www.reddit.com/user/matthew_garrison) or [""" + github + 
-				"](https://github.com/matthewgarrison/).\n"
+				"](https://github.com/matthewgarrison/).\n")
 		comment.reply(output)
 		comment.mark_read()
 		time.sleep(20)
