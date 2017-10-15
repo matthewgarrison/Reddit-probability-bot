@@ -125,8 +125,8 @@ for comment in reddit.inbox.unread(limit=None) :
 			print("Replied to ", comment.id)
 		except :
 			output = """I'm sorry, this comment is improperly formatted or contains no commands. You can 
-					view the correct format [here](https://github.com/matthewgarrison/Reddit-probability-
-					bot#usage).\n"""
+					view the correct format 
+					[here](https://github.com/matthewgarrison/Reddit-probability-bot#usage).\n"""
 			print("Error on", comment.id)
 		print(output)
 		github = ("GitHub" if RUNNING_ON_HEROKU else "Github")
