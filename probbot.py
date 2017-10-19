@@ -29,7 +29,6 @@ def calc_pi(num_iterations) :
 
 # Calcualtes the GCD of two numbers (using the Euclidean Algorithm).
 def GCD(a, b) :
-	if a < b : return GCD(b, a)
 	return a if b == 0 else GCD(b, a % b)
 
 # Returns a string containing the results of the dice rolls.
@@ -40,9 +39,7 @@ def roll_dice(num_dice, num_sides, constant, constant_type, no_breakdown, sort) 
 	results = []
 	for i in range(num_dice) :
 		results.append(random.randint(1, num_sides))
-	print(results)
 	if sort : results.sort(reverse=True)
-	print(results)
 	total = sum(results)
 	if constant_type == Constant.ADD : total += constant
 	elif constant_type == Constant.SUBTRACT : total -= constant
@@ -70,6 +67,8 @@ def flip_coins(num_coins) :
 		return "You got " + ans + ".\n\n"
 	else : return "You got " + str(results.count(0)) + " heads and " + str(results.count(1)) + " tails.\n\n"
 	
+
+
 
 
 # Pass in "T" as a CLI argument to indicate that this script is running on Heroku.
@@ -127,7 +126,6 @@ for comment in reddit.inbox.unread(limit=None) :
 							num_dice = int(parts[0])
 							num_sides = int(parts[1])
 							constant = int(parts[2])
-							print(match.group(1), match.group(1)=="*")
 							if match.group(1) == "+" : constant_type = Constant.ADD
 							elif match.group(1) == "-" : constant_type = Constant.SUBTRACT
 							elif match.group(1) == "*" : constant_type = Constant.MULTIPLY
@@ -136,7 +134,6 @@ for comment in reddit.inbox.unread(limit=None) :
 							if words[i] == "--nb" : no_breakdown = True
 							elif words[i] == "--s" : sort = True
 							i += 1
-					print(constant, constant_type)
 					output += roll_dice(num_dice, num_sides, constant, constant_type, no_breakdown, sort)
 				elif words[0] == "!flip" :
 					num = 1
