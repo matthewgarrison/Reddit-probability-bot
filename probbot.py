@@ -30,18 +30,23 @@ def roll_dice(num_dice, num_sides, addor, no_breakdown) :
 	else : num_dice = max(min(num_dice, 50), 1)
 	num_sides = max(min(num_sides, 10000), 2)
 	results = []
+	print("enter")
 	for i in range(num_dice) :
 		results.append(random.randint(1, num_sides))
-	output = "You rolled " + str(sum(results) + addor*num_dice) + "."
+	output = "You rolled " + str(sum(results) + addor) + "."
+	print("output")
 	if not no_breakdown and num_dice != 1 :
-		output += " Breakdown: "
+		output += " Breakdown: ("
 		for result in results[:-1] :
 			output += str(result)
-			if addor != 0 : output += "+" + str(addor)
 			output += ", "
-		output += str(results[len(results)-1])
-		if addor != 0 : output += "+" + str(addor)
+		output += str(results[-1])
+		print("bah")
+		print(addor)
+		output += ")"
+		if addor != 0 : output += " + " + str(addor)
 		output += "."
+	print("exit")
 	return output + "\n\n"
 
 # Returns a string containing the results of the coin flips.
