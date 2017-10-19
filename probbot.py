@@ -15,7 +15,6 @@ def calc_pi(num_iterations) :
 		one = random.randrange(10000000)
 		two = random.randrange(10000000)
 		if GCD(one, two) == 1 : num_coprime += 1
-	print(num_coprime)
 	prob_comprime = num_coprime / num_iterations
 	pi = math.sqrt(6 / prob_comprime)
 	return "With " + str(num_iterations) + " iterations, I approximated PI as " + str(pi) + ".\n\n"
