@@ -124,16 +124,15 @@ for comment in reddit.inbox.unread(limit=None) :
 				raise Exception("Invalid syntax")
 			print("Replied to ", comment.id)
 		except :
-			output = """I'm sorry, this comment is improperly formatted or contains no commands. You can 
-					view the correct format 
-					[here](https://github.com/matthewgarrison/Reddit-probability-bot#usage).\n"""
+			output = ( "I'm sorry, this comment is improperly formatted or contains no commands. You can " +
+					"view the correct format [here](https://github.com/matthewgarrison/Reddit-probability-bot#usage).\n\n" )
 			print("Error on", comment.id)
 		print(output)
 		github = ("GitHub" if RUNNING_ON_HEROKU else "Github")
-		output += ("""\n*****\nThis bot was made by Matthew Garrison. You can view its source 
-				[here](https://github.com/matthewgarrison/Reddit-probability-bot). You can contact me on 
-				[Reddit](https://www.reddit.com/user/matthew_garrison) or [""" + github + 
-				"](https://github.com/matthewgarrison/).\n")
+		output += ( "*****\n\n^^made ^^by ^^Matthew ^^Garrison ^^| [^^source ^^code]" +
+				"(https://github.com/matthewgarrison/Reddit-probability-bot) ^^| ^^contact ^^me ^^on " +
+				"[^^Reddit](https://www.reddit.com/user/matthew_garrison) ^^or [^^" + github + 
+				"](https://github.com/matthewgarrison/)\n\n" )
 		comment.reply(output)
 		comment.mark_read()
 		time.sleep(20)
