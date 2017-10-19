@@ -33,31 +33,30 @@ def GCD(a, b) :
 	return a if b == 0 else GCD(b, a % b)
 
 # Returns a string containing the results of the dice rolls.
-def roll_dice(num_dice, num_sides, constant, constant_type, no_breakdown) :
+def roll_dice(num_dice, num_sides, constant, constant_type, no_breakdown, sort) :
 	if no_breakdown : num_dice = max(min(num_dice, 1000), 1)
 	else : num_dice = max(min(num_dice, 50), 1)
 	num_sides = max(min(num_sides, 10000), 2)
 	results = []
-	print("enter")
 	for i in range(num_dice) :
 		results.append(random.randint(1, num_sides))
+	print(results)
+	if sort : results.sort(reverse=True)
+	print(results)
 	total = sum(results)
 	if constant_type == Constant.ADD : total += constant
 	elif constant_type == Constant.SUBTRACT : total -= constant
 	elif constant_type == Constant.MULTIPLY : total *= constant
 	output = "You rolled " + str(total) + "."
-	print("output")
 	if not no_breakdown and num_dice != 1 :
 		output += " Breakdown: ("
 		for result in results[:-1] : output += str(result) + ", "
 		output += str(results[-1])
-		print("bah")
 		output += ")"
 		if constant_type == Constant.ADD : output += " + " + str(constant)
 		elif constant_type == Constant.SUBTRACT : output += " - " + str(constant)
 		elif constant_type == Constant.MULTIPLY : output += " * " + str(constant)
 		output += "."
-	print("exit")
 	return output + "\n\n"
 
 # Returns a string containing the results of the coin flips.
@@ -101,14 +100,14 @@ for comment in reddit.inbox.unread(limit=None) :
 			for line in lines :
 				# For each word in the line, we check if it matches one of the commands. If it does, 
 				# we also check the next word in case it contains a number.
-				words = re.split("\s", line)
+				words = re.split("\s+", line)
 				print(comment.id, words)
 				if words[0] == "!roll" :
 					num_dice = 1
 					num_sides = 0
 					constant = 0
 					constant_type = Constant.NONE
-					no_breakdown = False
+					no_breakdown = sort = False
 					if len(words) > 1 :
 						if re.fullmatch("\d+", words[1]) : 
 							# A
@@ -124,7 +123,6 @@ for comment in reddit.inbox.unread(limit=None) :
 						match = re.fullmatch("\d+d\d+(\+|-|\*)-?\d+", words[1])
 						if match :
 							# AdB(+|-|*)C 
-							print("bing")
 							parts = re.split("[d+\-*]", words[1], maxsplit=2)
 							num_dice = int(parts[0])
 							num_sides = int(parts[1])
@@ -136,8 +134,10 @@ for comment in reddit.inbox.unread(limit=None) :
 						i = 2
 						while i < len(words) :
 							if words[i] == "--nb" : no_breakdown = True
+							elif words[i] == "--s" : sort = True
+							i += 1
 					print(constant, constant_type)
-					output += roll_dice(num_dice, num_sides, constant, constant_type, no_breakdown)
+					output += roll_dice(num_dice, num_sides, constant, constant_type, no_breakdown, sort)
 				elif words[0] == "!flip" :
 					num = 1
 					if len(words) > 1 and re.fullmatch("\d+", words[1]) : num = int(words[1])
