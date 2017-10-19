@@ -5,6 +5,14 @@ import random
 import re
 import sys
 import time
+import traceback
+from enum import Enum
+
+class Constant(Enum) :
+	NONE = 0
+	ADD = 1
+	SUBTRACT = 2
+	MULTIPLY = 3
 
 # Approximates PI using the fact that the probability of two random numbers being comprime is 6/PI^2.
 # Source: http://www.cut-the-knot.org/m/Probability/TwoCoprime.shtml
@@ -25,7 +33,7 @@ def GCD(a, b) :
 	return a if b == 0 else GCD(b, a % b)
 
 # Returns a string containing the results of the dice rolls.
-def roll_dice(num_dice, num_sides, addor, no_breakdown) :
+def roll_dice(num_dice, num_sides, constant, constant_type, no_breakdown) :
 	if no_breakdown : num_dice = max(min(num_dice, 1000), 1)
 	else : num_dice = max(min(num_dice, 50), 1)
 	num_sides = max(min(num_sides, 10000), 2)
@@ -33,18 +41,21 @@ def roll_dice(num_dice, num_sides, addor, no_breakdown) :
 	print("enter")
 	for i in range(num_dice) :
 		results.append(random.randint(1, num_sides))
-	output = "You rolled " + str(sum(results) + addor) + "."
+	total = sum(results)
+	if constant_type == Constant.ADD : total += constant
+	elif constant_type == Constant.SUBTRACT : total -= constant
+	elif constant_type == Constant.MULTIPLY : total *= constant
+	output = "You rolled " + str(total) + "."
 	print("output")
 	if not no_breakdown and num_dice != 1 :
 		output += " Breakdown: ("
-		for result in results[:-1] :
-			output += str(result)
-			output += ", "
+		for result in results[:-1] : output += str(result) + ", "
 		output += str(results[-1])
 		print("bah")
-		print(addor)
 		output += ")"
-		if addor != 0 : output += " + " + str(addor)
+		if constant_type == Constant.ADD : output += " + " + str(constant)
+		elif constant_type == Constant.SUBTRACT : output += " - " + str(constant)
+		elif constant_type == Constant.MULTIPLY : output += " * " + str(constant)
 		output += "."
 	print("exit")
 	return output + "\n\n"
@@ -93,7 +104,40 @@ for comment in reddit.inbox.unread(limit=None) :
 				words = re.split("\s", line)
 				print(comment.id, words)
 				if words[0] == "!roll" :
-					pass
+					num_dice = 1
+					num_sides = 0
+					constant = 0
+					constant_type = Constant.NONE
+					no_breakdown = False
+					if len(words) > 1 :
+						if re.fullmatch("\d+", words[1]) : 
+							# A
+							num_dice = int(words[1])
+						elif re.fullmatch("d\d+", words[1]) : 
+							# dB
+							num_sides = int(words[1][1:])
+						elif re.fullmatch("\d+d\d+", words[1]) :
+							# AdB
+							parts = words[1].split("d")
+							num_dice = int(parts[0])
+							num_sides = int(parts[1])
+						match = re.fullmatch("\d+d\d+(\+|-|\*)-?\d+", words[1])
+						if match :
+							# AdB(+|-|*)C 
+							print("bing")
+							parts = re.split("[d+\-*]", words[1], maxsplit=2)
+							num_dice = int(parts[0])
+							num_sides = int(parts[1])
+							constant = int(parts[2])
+							print(match.group(1), match.group(1)=="*")
+							if match.group(1) == "+" : constant_type = Constant.ADD
+							elif match.group(1) == "-" : constant_type = Constant.SUBTRACT
+							elif match.group(1) == "*" : constant_type = Constant.MULTIPLY
+						i = 2
+						while i < len(words) :
+							if words[i] == "--nb" : no_breakdown = True
+					print(constant, constant_type)
+					output += roll_dice(num_dice, num_sides, constant, constant_type, no_breakdown)
 				elif words[0] == "!flip" :
 					num = 1
 					if len(words) > 1 and re.fullmatch("\d+", words[1]) : num = int(words[1])
@@ -111,6 +155,7 @@ for comment in reddit.inbox.unread(limit=None) :
 			output = ( "I'm sorry, this comment is improperly formatted or contains no commands. You can " +
 					"view the correct format [here](https://github.com/matthewgarrison/Reddit-probability-bot#usage).\n\n" )
 			print("Error on", comment.id)
+			traceback.print_exc()
 		print(output)
 		github = ("GitHub" if RUNNING_ON_HEROKU else "Github")
 		output += ( "*****\n\n^^made ^^by ^^Matthew ^^Garrison ^^| [^^source ^^code]" +
