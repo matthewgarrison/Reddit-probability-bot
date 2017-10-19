@@ -5,6 +5,14 @@ import random
 import re
 import sys
 import time
+import traceback
+from enum import Enum
+
+class Constant(Enum) :
+	NONE = 0
+	ADD = 1
+	SUBTRACT = 2
+	MULTIPLY = 3
 
 # Approximates PI using the fact that the probability of two random numbers being comprime is 6/PI^2.
 # Source: http://www.cut-the-knot.org/m/Probability/TwoCoprime.shtml
@@ -21,32 +29,31 @@ def calc_pi(num_iterations) :
 
 # Calcualtes the GCD of two numbers (using the Euclidean Algorithm).
 def GCD(a, b) :
-	if a < b : return GCD(b, a)
 	return a if b == 0 else GCD(b, a % b)
 
 # Returns a string containing the results of the dice rolls.
-def roll_dice(num_dice, num_sides, addor, no_breakdown) :
+def roll_dice(num_dice, num_sides, constant, constant_type, no_breakdown, sort) :
 	if no_breakdown : num_dice = max(min(num_dice, 1000), 1)
 	else : num_dice = max(min(num_dice, 50), 1)
 	num_sides = max(min(num_sides, 10000), 2)
 	results = []
-	print("enter")
 	for i in range(num_dice) :
 		results.append(random.randint(1, num_sides))
-	output = "You rolled " + str(sum(results) + addor) + "."
-	print("output")
+	if sort : results.sort(reverse=True)
+	total = sum(results)
+	if constant_type == Constant.ADD : total += constant
+	elif constant_type == Constant.SUBTRACT : total -= constant
+	elif constant_type == Constant.MULTIPLY : total *= constant
+	output = "You rolled " + str(total) + "."
 	if not no_breakdown and num_dice != 1 :
 		output += " Breakdown: ("
-		for result in results[:-1] :
-			output += str(result)
-			output += ", "
+		for result in results[:-1] : output += str(result) + ", "
 		output += str(results[-1])
-		print("bah")
-		print(addor)
 		output += ")"
-		if addor != 0 : output += " + " + str(addor)
+		if constant_type == Constant.ADD : output += " + " + str(constant)
+		elif constant_type == Constant.SUBTRACT : output += " - " + str(constant)
+		elif constant_type == Constant.MULTIPLY : output += " * " + str(constant)
 		output += "."
-	print("exit")
 	return output + "\n\n"
 
 # Returns a string containing the results of the coin flips.
@@ -60,6 +67,8 @@ def flip_coins(num_coins) :
 		return "You got " + ans + ".\n\n"
 	else : return "You got " + str(results.count(0)) + " heads and " + str(results.count(1)) + " tails.\n\n"
 	
+
+
 
 
 # Pass in "T" as a CLI argument to indicate that this script is running on Heroku.
@@ -90,47 +99,60 @@ for comment in reddit.inbox.unread(limit=None) :
 			for line in lines :
 				# For each word in the line, we check if it matches one of the commands. If it does, 
 				# we also check the next word in case it contains a number.
-				words = re.split("[^a-zA-Z0-9\!\+_\-]+", line)
+				words = re.split("\s+", line)
 				print(comment.id, words)
-				i = 0
-				while i < len(words)-1 :
-					if words[i] == "!roll" or words[i] == "!roll_nb" : 
-						no_breakdown = (words[i] == "!roll_nb")
-						num = 1
-						sides = 6
-						addor = 0
-						if re.match("\d(d\d)*", words[i+1]) :
-							parts = re.split("d|\+", words[i+1])
-							if (len(parts) == 1) :
-								num = int(parts[0])
-								sides = 6
-							elif (len(parts) == 2) :
-								num = int(parts[0])
-								sides = int(parts[1])
-							else :
-								num = int(parts[0])
-								sides = int(parts[1])
-								addor = int(parts[2])
-						output += roll_dice(num, sides, addor, no_breakdown)
-					if words[i] == "!flip" : 
-						num = 1
-						if re.match("\d", words[i+1]) : num = int(words[i+1])
-						output += flip_coins(num)
-					if words[i] == "!pi" :
-						num = 1000
-						if re.match("\d", words[i+1]) : num = int(words[i+1])
-						output += calc_pi(num)
-					i += 1
-				if words[-1] == "!roll" or words[-1] == "!roll_nb" : output += roll_dice(1, 6, 0, True)
-				elif words[-1] == "!flip" : output += flip_coins(1)
-				elif words[-1] == "!pi" : output += calc_pi(1000)
+				if words[0] == "!roll" :
+					num_dice = 1
+					num_sides = 0
+					constant = 0
+					constant_type = Constant.NONE
+					no_breakdown = sort = False
+					if len(words) > 1 :
+						if re.fullmatch("\d+", words[1]) : 
+							# A
+							num_dice = int(words[1])
+						elif re.fullmatch("d\d+", words[1]) : 
+							# dB
+							num_sides = int(words[1][1:])
+						elif re.fullmatch("\d+d\d+", words[1]) :
+							# AdB
+							parts = words[1].split("d")
+							num_dice = int(parts[0])
+							num_sides = int(parts[1])
+						match = re.fullmatch("\d+d\d+(\+|-|\*)-?\d+", words[1])
+						if match :
+							# AdB(+|-|*)C 
+							parts = re.split("[d+\-*]", words[1], maxsplit=2)
+							num_dice = int(parts[0])
+							num_sides = int(parts[1])
+							constant = int(parts[2])
+							if match.group(1) == "+" : constant_type = Constant.ADD
+							elif match.group(1) == "-" : constant_type = Constant.SUBTRACT
+							elif match.group(1) == "*" : constant_type = Constant.MULTIPLY
+						i = 2
+						while i < len(words) :
+							if words[i] == "--nb" : no_breakdown = True
+							elif words[i] == "--s" : sort = True
+							i += 1
+					output += roll_dice(num_dice, num_sides, constant, constant_type, no_breakdown, sort)
+				elif words[0] == "!flip" :
+					num = 1
+					if len(words) > 1 and re.fullmatch("\d+", words[1]) : num = int(words[1])
+					output += flip_coins(num)
+				elif words[0] == "!pi" :
+					num = 1
+					if len(words) > 1 and re.fullmatch("\d+", words[1]) : num = int(words[1])
+					output += calc_pi(num)
+				
+				
 			if output == "" :
 				raise Exception("Invalid syntax")
-			print("Replied to ", comment.id)
+			print("Replied to", comment.id)
 		except :
 			output = ( "I'm sorry, this comment is improperly formatted or contains no commands. You can " +
 					"view the correct format [here](https://github.com/matthewgarrison/Reddit-probability-bot#usage).\n\n" )
 			print("Error on", comment.id)
+			traceback.print_exc()
 		print(output)
 		github = ("GitHub" if RUNNING_ON_HEROKU else "Github")
 		output += ( "*****\n\n^^made ^^by ^^Matthew ^^Garrison ^^| [^^source ^^code]" +
