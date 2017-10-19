@@ -90,43 +90,23 @@ for comment in reddit.inbox.unread(limit=None) :
 			for line in lines :
 				# For each word in the line, we check if it matches one of the commands. If it does, 
 				# we also check the next word in case it contains a number.
-				words = re.split("[^a-zA-Z0-9\!\+_\-]+", line)
+				words = re.split("\s", line)
 				print(comment.id, words)
-				i = 0
-				while i < len(words)-1 :
-					if words[i] == "!roll" or words[i] == "!roll_nb" : 
-						no_breakdown = (words[i] == "!roll_nb")
-						num = 1
-						sides = 6
-						addor = 0
-						if re.match("\d(d\d)*", words[i+1]) :
-							parts = re.split("d|\+", words[i+1])
-							if (len(parts) == 1) :
-								num = int(parts[0])
-								sides = 6
-							elif (len(parts) == 2) :
-								num = int(parts[0])
-								sides = int(parts[1])
-							else :
-								num = int(parts[0])
-								sides = int(parts[1])
-								addor = int(parts[2])
-						output += roll_dice(num, sides, addor, no_breakdown)
-					if words[i] == "!flip" : 
-						num = 1
-						if re.match("\d", words[i+1]) : num = int(words[i+1])
-						output += flip_coins(num)
-					if words[i] == "!pi" :
-						num = 1000
-						if re.match("\d", words[i+1]) : num = int(words[i+1])
-						output += calc_pi(num)
-					i += 1
-				if words[-1] == "!roll" or words[-1] == "!roll_nb" : output += roll_dice(1, 6, 0, True)
-				elif words[-1] == "!flip" : output += flip_coins(1)
-				elif words[-1] == "!pi" : output += calc_pi(1000)
+				if words[0] == "!roll" :
+					pass
+				elif words[0] == "!flip" :
+					num = 1
+					if len(words) > 1 and re.fullmatch("\d+", words[1]) : num = int(words[1])
+					output += flip_coins(num)
+				elif words[0] == "!pi" :
+					num = 1
+					if len(words) > 1 and re.fullmatch("\d+", words[1]) : num = int(words[1])
+					output += calc_pi(num)
+				
+				
 			if output == "" :
 				raise Exception("Invalid syntax")
-			print("Replied to ", comment.id)
+			print("Replied to", comment.id)
 		except :
 			output = ( "I'm sorry, this comment is improperly formatted or contains no commands. You can " +
 					"view the correct format [here](https://github.com/matthewgarrison/Reddit-probability-bot#usage).\n\n" )
