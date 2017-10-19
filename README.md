@@ -69,4 +69,4 @@ With 12345 iterations, I approximated PI as 3.1472297068205846.
 
 ## How am I approximating PI?
 
-The probability of two random numbers being coprime is 6/(PI^2) ([source](http://www.cut-the-knot.org/m/Probability/TwoCoprime.shtml)). Therefore, if we generate N pairs of random numbers, count how many of them are coprime, and do a little math, we can approximate PI. Cool, huh?
+The probability of two random numbers being coprime is 6/π<sup>2</sup> ([source](http://www.cut-the-knot.org/m/Probability/TwoCoprime.shtml)). Therefore, if we generate N pairs of random numbers, count how many of them are coprime, and do a little math, we can approximate PI. Cool, huh?
