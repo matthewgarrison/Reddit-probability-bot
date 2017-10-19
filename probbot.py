@@ -78,7 +78,7 @@ for comment in reddit.inbox.unread(limit=None) :
 	if subreddit in banned_subreddits :
 		comment.mark_read()
 		continue
-	if re.search("/u/ProbabilityBot_", comment.body) :
+	if re.search("/u/ProbabilityBot_", comment.body, re.IGNORECASE) :
 		output = ""
 		try :
 			lines = comment.body.splitlines()
