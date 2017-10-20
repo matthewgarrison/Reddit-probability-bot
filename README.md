@@ -34,6 +34,14 @@ In addition, you can use these flags:
 
 * `--a`: calculates the average result of your rolls
 
+* `--dl`: discards the lowest roll
+
+* `--dl N`: discards the lowest `N` rolls
+
+* `--dh`: discards the highest roll
+
+* `--dh N`: discards the highest `N` rolls
+
 ### !fate
 
 Rolls [Fate](https://en.wikipedia.org/wiki/Fudge_(role-playing_game_system)#Fudge_dice) (or Fudge) dice. By default, it rolls 4 dice.
@@ -90,6 +98,8 @@ If you commented:
 !roll 6d7*2
 !roll 25d250 --s --a
 !roll 500d20 --nb --a
+!roll 10d20 --dl 5
+!roll 10d20 --dh 3
 !fate
 !fate +3
 !fate -2
@@ -110,6 +120,8 @@ You rolled 11. Breakdown: (3, 2, 5, 5, 4, 1) - 9.
 You rolled 50. Breakdown: (2, 5, 2, 7, 3, 6) * 2.
 You rolled 115, with an average of 9.5833. Breakdown: (20, 18, 17, 14, 13, 8, 7, 6, 5, 5, 1, 1).
 You rolled 4827, with an average of 9.6540.
+You rolled 81. Breakdown: (~~2~~, ~~8~~, ~~7~~, 15, 16, ~~11~~, 20, ~~1~~, 11, 19).
+You rolled 51. Breakdown: (12, ~~16~~, 13, 2, 2, 10, ~~18~~, ~~15~~, 4, 8).
 You rolled -1. Breakdown: (0, 0, -, 0).
 You rolled 3. Breakdown: (-, 0, +, 0) + 3.
 You rolled -1. Breakdown: (+, 0, -, +) - 2.
