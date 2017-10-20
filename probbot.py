@@ -14,9 +14,14 @@ class Constant(Enum) :
 	SUBTRACT = 2
 	MULTIPLY = 3
 
+class Discard(Enum) :
+	NONE = 0
+	LOWEST = 1
+	HIGHEST = 2
+
 
 # Returns a string containing the results of the dice rolls.
-def roll_dice(num_dice, num_sides, constant, constant_type, no_breakdown, sort, average) :
+def roll_dice(num_dice, num_sides, constant, constant_type, no_breakdown, sort, average, discard_count, discard_type) :
 	if no_breakdown : num_dice = max(min(num_dice, 1000), 1)
 	else : num_dice = max(min(num_dice, 50), 1)
 	num_sides = max(min(num_sides, 10000), 2)
@@ -25,6 +30,12 @@ def roll_dice(num_dice, num_sides, constant, constant_type, no_breakdown, sort, 
 		results.append(random.randint(1, num_sides))
 	if sort : results.sort(reverse=True)
 	total = sum(results)
+	if discard_type != Discard.NONE :
+		# Sort the list then remove all the dice we are keeping.
+		if discard_type == Discard.LOWEST : discarded_results = sorted(results, reverse=True)
+		else : discarded_results = sorted(results)
+		for i in range(num_dice - discard_count) : discarded_results.remove(discarded_results[0])
+		total -= sum(discarded_results)
 	if constant_type == Constant.ADD : total += constant
 	elif constant_type == Constant.SUBTRACT : total -= constant
 	elif constant_type == Constant.MULTIPLY : total *= constant
@@ -33,8 +44,19 @@ def roll_dice(num_dice, num_sides, constant, constant_type, no_breakdown, sort, 
 	output += "."
 	if not no_breakdown and num_dice != 1 :
 		output += " Breakdown: ("
-		for result in results[:-1] : output += str(result) + ", "
-		output += str(results[-1])
+		if discard_type == Discard.NONE :
+			for result in results[:-1] : output += str(result) + ", "
+			output += str(results[-1])
+		else :
+			for result in results[:-1] :
+				if result in discarded_results :
+					output += "~~" + str(result) + "~~" + ", "
+					discarded_results.remove(result)
+				else : output += str(result) + ", "
+			if results[-1] in discarded_results :
+				output += "~~" + str(results[-1]) + "~~"
+				discarded_results.remove(results[-1])
+			else : output += str(results[-1])
 		output += ")"
 		if constant_type == Constant.ADD : output += " + " + str(constant)
 		elif constant_type == Constant.SUBTRACT : output += " - " + str(constant)
@@ -136,6 +158,8 @@ for comment in reddit.inbox.unread(limit=None) :
 					num_sides = 0
 					constant = 0
 					constant_type = Constant.NONE
+					discard_count = 1
+					discard_type = Discard.NONE
 					no_breakdown = sort = average = False
 					if len(words) > 1 :
 						if re.fullmatch("\d+", words[1]) : 
@@ -164,8 +188,17 @@ for comment in reddit.inbox.unread(limit=None) :
 							if words[i] == "--nb" : no_breakdown = True
 							elif words[i] == "--s" : sort = True
 							elif words[i] == "--a" : average = True
+							elif words[i] == "--dl" :
+								discard_type = Discard.LOWEST
+								if i+1 < len(words) and re.fullmatch("\d+", words[i+1]) : 
+									discard_count = int(words[i+1])
+							elif words[i] == "--dh" :
+								discard_type = Discard.HIGHEST
+								if i+1 < len(words) and re.fullmatch("\d+", words[i+1]) : 
+									discard_count = int(words[i+1])
 							i += 1
-					output += roll_dice(num_dice, num_sides, constant, constant_type, no_breakdown, sort, average)
+					output += ( roll_dice(num_dice, num_sides, constant, constant_type, no_breakdown, 
+						sort, average, discard_count, discard_type) )
 				elif words[0] == "!fate" :
 					num_dice = 4
 					constant = 0
