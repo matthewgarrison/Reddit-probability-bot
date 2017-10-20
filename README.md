@@ -109,7 +109,7 @@ If you commented:
 !pi 4000
 ```
 
-You would get a reply like:
+You would get a reply like (where `~` represented strike-throughs):
 
 ```
 You rolled 1.
