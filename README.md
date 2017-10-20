@@ -6,11 +6,11 @@ A bot built in Python that performs basic probability tasks, such as rolling dic
 
 You must first call the bot with `/u/ProbabilityBot_`, and then use one (or multiple) of the following commands. You can only have one command per line, and it must be at the beginning of the line.
 
-###!roll
+### !roll
 
 This command rolls one or more dice, and provides a breakdown of what you rolled. The maximum number of dice you can roll at once is 50 and the maximum number of sides a given die can have is 10000.
 
-####Arguments
+#### Arguments
 
 You can specify how many and what kind of dice to using standard dice notation:
 
@@ -22,9 +22,9 @@ You can specify how many and what kind of dice to using standard dice notation:
 
 * `XdY+Z`: rolls `X` `Y`-sided dice and adds `Z` to the total
 
-* `XdY+Z`: rolls `X` `Y`-sided dice and subtracts `Z` from the total
+* `XdY-Z`: rolls `X` `Y`-sided dice and subtracts `Z` from the total
 
-* `XdY+Z`: rolls `X` `Y`-sided dice and multiplies the total by `Z`
+* `XdY*Z`: rolls `X` `Y`-sided dice and multiplies the total by `Z`
 
 In addition, you can use these flags:
 
@@ -32,19 +32,19 @@ In addition, you can use these flags:
 
 * `--s`: sorts the breakdown of your results (descending)
 
-###!flip
+### !flip 
 
 Flips one or more coins.
 
-####Arguments
+#### Arguments 
 
 * `N`: flips `N` coins
 
-###!pi
+### !pi
 
 Approximates pi using 1000 iterations
 
-####Arguments
+#### Arguments
 
 * `N`: use `N` iterations
 
