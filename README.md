@@ -4,27 +4,49 @@ A bot built in Python that performs basic probability tasks, such as rolling dic
 
 ## Usage
 
-You must first call the bot with `/u/ProbabilityBot_`, and then use one (or multiple) of the following commands:
+You must first call the bot with `/u/ProbabilityBot_`, and then use one (or multiple) of the following commands. You can only have one command per line, and it must be at the beginning of the line.
 
-* `!roll`: Rolls a single, six-sided die.
+###!roll
 
-* `!roll AdB`: Rolls a die with `B` sides, `A` times, and returns the total, as well as the breakdown of what you rolled (if more than one die was rolled). `A` is capped at 50 and `B` is capped at 10000.
+This command rolls one or more dice, and provides a breakdown of what you rolled. The maximum number of dice you can roll at once is 50 and the maximum number of sides a given die can have is 10000.
 
-* `!roll AdB+C`: Rolls a die with `B` sides and adds `C` to the roll, `A` times, and returns the total, as well as the breakdown of what you rolled (if more than one die was rolled). `A` is capped at 50 and `B` is capped at 10000 (`C` has no cap, and can be negative).
+####Arguments
 
-* `roll_nb`: The same as `!roll`.
+You can specify how many and what kind of dice to using standard dice notation:
 
-* `!roll_nb AdB`: The same as `!roll AdB`, except no breakdown of your rolls is provided and `A` is capped at 1000.
+* `X`: rolls `X` 6-sided dice
 
-* `!roll_nb AdB+C`: The same as `!roll AdB+C`, except no breakdown of your rolls is provided and `A` is capped at 1000.
+* `dY`: rolls a single `Y`-sided die
 
-* `!flip`: Flips a single coin.
+* `XdY`: rolls `X` `Y`-sided dice
 
-* `!flip N`: Flips `N` coins.
+* `XdY+Z`: rolls `X` `Y`-sided dice and adds `Z` to the total
 
-* `!pi`: Approximates PI with 1000 iterations.
+* `XdY+Z`: rolls `X` `Y`-sided dice and subtracts `Z` from the total
 
-* `!pi N`: Approximates PI with `N` iterations (min is 100 iterations and max is 100000).
+* `XdY+Z`: rolls `X` `Y`-sided dice and multiplies the total by `Z`
+
+In addition, you can use these flags:
+
+* `--nb`: no breakdown of your rolls is provided and increases the maximum number of dice you can roll at once to 1000
+
+* `--s`: sorts the breakdown of your results (descending)
+
+###!flip
+
+Flips one or more coins.
+
+####Arguments
+
+* `N`: flips `N` coins
+
+###!pi
+
+Approximates pi using 1000 iterations
+
+####Arguments
+
+* `N`: use `N` iterations
 
 ## Examples
 
@@ -33,38 +55,37 @@ If you commented:
 ```
 /u/ProbabilityBot_
 !roll
-!roll 12
-!roll 7d8
-!roll 4d9+10
-!roll 6d4+-2
-!roll_nb
-!roll_nb 15
-!roll_nb 9d4
-!roll_nb 15d5+6
-!roll_nb 12d6+-3
+!roll 5d7
+!roll d10
+!roll 12d5+4
+!roll 4d2+-5
+!roll 6d7-9
+!roll 5d87--10
+!roll 6d7*2
+!roll 25d250 --s
+!roll 350d350 --nb
 !flip
-!flip 20
+!flip 40
 !pi
-!pi 12345
+!pi 4000
 ```
 
 You would get a reply like:
 
 ```
-You rolled 3.
-You rolled 50. Breakdown: 4, 4, 1, 6, 6, 1, 6, 6, 2, 5, 5, 4.
-You rolled 41. Breakdown: 6, 6, 5, 8, 6, 2, 8.
-You rolled 52. Breakdown: 8+10, 1+10, 1+10, 2+10.
-You rolled 2. Breakdown: 2+-2, 1+-2, 3+-2, 3+-2, 3+-2, 2+-2.
+You rolled 1.
+You rolled 17. Breakdown: (4, 1, 5, 4, 3).
 You rolled 6.
-You rolled 67.
-You rolled 17.
-You rolled 134.
-You rolled 2.
-You got heads.
-You got 10 heads and 10 tails.
-With 1000 iterations, I approximated PI as 3.1570203370643455.
-With 12345 iterations, I approximated PI as 3.1472297068205846.
+You rolled 44. Breakdown: (3, 4, 1, 2, 5, 1, 3, 5, 3, 4, 5, 4) + 4.
+You rolled 1. Breakdown: (2, 2, 1, 1) + -5.
+You rolled 11. Breakdown: (3, 2, 5, 5, 4, 1) - 9.
+You rolled 126. Breakdown: (16, 3, 53, 3, 41) - -10.
+You rolled 50. Breakdown: (2, 5, 2, 7, 3, 6) * 2.
+You rolled 3208. Breakdown: (227, 210, 207, 206, 198, 176, 171, 156, 155, 145, 130, 127, 126, 126, 123, 114, 110, 99, 95, 85, 84, 71, 38, 27, 2).
+You got tails.
+You got 20 heads and 20 tails.
+With 100 iterations, I approximated PI as 3.302891295379082.
+With 4000 iterations, I approximated PI as 3.1517891481565017.
 ```
 
 ## How am I approximating PI?
