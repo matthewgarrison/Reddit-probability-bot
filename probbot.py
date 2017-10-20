@@ -32,7 +32,7 @@ def GCD(a, b) :
 	return a if b == 0 else GCD(b, a % b)
 
 # Returns a string containing the results of the dice rolls.
-def roll_dice(num_dice, num_sides, constant, constant_type, no_breakdown, sort) :
+def roll_dice(num_dice, num_sides, constant, constant_type, no_breakdown, sort, average) :
 	if no_breakdown : num_dice = max(min(num_dice, 1000), 1)
 	else : num_dice = max(min(num_dice, 50), 1)
 	num_sides = max(min(num_sides, 10000), 2)
@@ -44,7 +44,9 @@ def roll_dice(num_dice, num_sides, constant, constant_type, no_breakdown, sort) 
 	if constant_type == Constant.ADD : total += constant
 	elif constant_type == Constant.SUBTRACT : total -= constant
 	elif constant_type == Constant.MULTIPLY : total *= constant
-	output = "You rolled " + str(total) + "."
+	output = "You rolled " + str(total)
+	if average : output += ", with an average of " + "{:.4f}".format(total / num_dice)
+	output += "."
 	if not no_breakdown and num_dice != 1 :
 		output += " Breakdown: ("
 		for result in results[:-1] : output += str(result) + ", "
@@ -106,7 +108,7 @@ for comment in reddit.inbox.unread(limit=None) :
 					num_sides = 0
 					constant = 0
 					constant_type = Constant.NONE
-					no_breakdown = sort = False
+					no_breakdown = sort = average = False
 					if len(words) > 1 :
 						if re.fullmatch("\d+", words[1]) : 
 							# A
@@ -129,12 +131,13 @@ for comment in reddit.inbox.unread(limit=None) :
 							if match.group(1) == "+" : constant_type = Constant.ADD
 							elif match.group(1) == "-" : constant_type = Constant.SUBTRACT
 							elif match.group(1) == "*" : constant_type = Constant.MULTIPLY
-						i = 2
+						i = 1
 						while i < len(words) :
 							if words[i] == "--nb" : no_breakdown = True
 							elif words[i] == "--s" : sort = True
+							elif words[i] == "--a" : average = True
 							i += 1
-					output += roll_dice(num_dice, num_sides, constant, constant_type, no_breakdown, sort)
+					output += roll_dice(num_dice, num_sides, constant, constant_type, no_breakdown, sort, average)
 				elif words[0] == "!flip" :
 					num = 1
 					if len(words) > 1 and re.fullmatch("\d+", words[1]) : num = int(words[1])
