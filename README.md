@@ -42,7 +42,7 @@ Flips one or more coins.
 
 ### !pi
 
-Approximates pi using 1000 iterations
+Approximates pi using 1000 iterations.
 
 #### Arguments
 
