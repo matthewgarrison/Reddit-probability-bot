@@ -25,7 +25,7 @@ def calc_pi(num_iterations) :
 		if GCD(one, two) == 1 : num_coprime += 1
 	prob_comprime = num_coprime / num_iterations
 	pi = math.sqrt(6 / prob_comprime)
-	return "With " + str(num_iterations) + " iterations, I approximated PI as " + str(pi) + ".\n\n"
+	return "With " + str(num_iterations) + " iterations, I approximated PI as " + "{:f}".format(pi) + ".\n\n"
 
 # Calcualtes the GCD of two numbers (using the Euclidean Algorithm).
 def GCD(a, b) :
@@ -143,7 +143,7 @@ for comment in reddit.inbox.unread(limit=None) :
 					if len(words) > 1 and re.fullmatch("\d+", words[1]) : num = int(words[1])
 					output += flip_coins(num)
 				elif words[0] == "!pi" :
-					num = 1
+					num = 1000
 					if len(words) > 1 and re.fullmatch("\d+", words[1]) : num = int(words[1])
 					output += calc_pi(num)
 				
