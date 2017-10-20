@@ -58,12 +58,10 @@ If you commented:
 !roll 5d7
 !roll d10
 !roll 12d5+4
-!roll 4d2+-5
 !roll 6d7-9
-!roll 5d87--10
 !roll 6d7*2
-!roll 25d250 --s
-!roll 350d350 --nb
+!roll 25d250 --s --a
+!roll 500d20 --nb --a
 !flip
 !flip 40
 !pi
@@ -77,15 +75,14 @@ You rolled 1.
 You rolled 17. Breakdown: (4, 1, 5, 4, 3).
 You rolled 6.
 You rolled 44. Breakdown: (3, 4, 1, 2, 5, 1, 3, 5, 3, 4, 5, 4) + 4.
-You rolled 1. Breakdown: (2, 2, 1, 1) + -5.
 You rolled 11. Breakdown: (3, 2, 5, 5, 4, 1) - 9.
-You rolled 126. Breakdown: (16, 3, 53, 3, 41) - -10.
 You rolled 50. Breakdown: (2, 5, 2, 7, 3, 6) * 2.
-You rolled 3208. Breakdown: (227, 210, 207, 206, 198, 176, 171, 156, 155, 145, 130, 127, 126, 126, 123, 114, 110, 99, 95, 85, 84, 71, 38, 27, 2).
+You rolled 115, with an average of 9.5833. Breakdown: (20, 18, 17, 14, 13, 8, 7, 6, 5, 5, 1, 1).
+You rolled 4827, with an average of 9.6540.
 You got tails.
 You got 20 heads and 20 tails.
-With 100 iterations, I approximated PI as 3.302891295379082.
-With 4000 iterations, I approximated PI as 3.1517891481565017.
+With 1000 iterations, I approximated PI as 3.194383.
+With 4000 iterations, I approximated PI as 3.140759.
 ```
 
 ## How am I approximating PI?
