@@ -8,7 +8,7 @@ You must first call the bot with `/u/ProbabilityBot_`, and then use one (or mult
 
 ### !roll
 
-This command rolls one or more dice, and provides a breakdown of what you rolled. The maximum number of dice you can roll at once is 50 and the maximum number of sides a given die can have is 10000.
+This command rolls one or more dice, and provides a breakdown of what you rolled. By default, it rolls a single 6-sided die. The maximum number of dice you can roll at once is 50 and the maximum number of sides a given die can have is 10000.
 
 #### Arguments
 
@@ -30,13 +30,39 @@ In addition, you can use these flags:
 
 * `--nb`: no breakdown of your rolls is provided and the maximum number of dice you can roll at once is increased to 1000
 
-* `--s`: sorts the breakdown of the dice rolls (descending)
+* `--s`: sorts the breakdown of your rolls (descending)
 
-* `--a`: calculates the average result of the dice rolls
+* `--a`: calculates the average result of your rolls
+
+### !fate
+
+Rolls [Fate](https://en.wikipedia.org/wiki/Fudge_(role-playing_game_system)#Fudge_dice) (or Fudge) dice. By default, it rolls 4 dice.
+
+#### Arguments
+
+You can specify how many kind of dice to using standard dice notation:
+
+* `X`: rolls `X` Fate dice
+
+* `+Y`: rolls 4 Fate dice and adds `Y` to the total
+
+* `-Y`: rolls 4 Fate dice and subtracts `Y` from the total
+
+* `*Y`: rolls 4 Fate dice and multiplies the total by `Y`
+
+* `X+Y`: rolls `X` Fate dice and adds `Y` to the total
+
+* `X-Y`: rolls `X` Fate dice and subtracts `Y` from the total
+
+* `X*Y`: rolls `X` Fate dice and multiplies the total by `Y`
+
+In addition, you can use these flags:
+
+* `--nb`: no breakdown of your rolls is provided and the maximum number of dice you can roll at once is increased to 1000
 
 ### !flip 
 
-Flips one or more coins.
+Flips one or more coins. By default, it flips a single coin.
 
 #### Arguments 
 
@@ -44,11 +70,11 @@ Flips one or more coins.
 
 ### !pi
 
-Approximates pi using 1000 iterations.
+Approximates pi. The probability of two random numbers being coprime is 6/π<sup>2</sup> ([source](http://www.cut-the-knot.org/m/Probability/TwoCoprime.shtml)). Therefore, if we generate N pairs of random numbers, count how many of them are coprime, and do a little math, we can approximate PI. By default, it uses 1000 pairs of random numbers. The maximum number of pairs you can do is 100000.
 
 #### Arguments
 
-* `N`: use `N` iterations
+* `N`: use `N` pairs of random numbers
 
 ## Examples
 
@@ -64,6 +90,9 @@ If you commented:
 !roll 6d7*2
 !roll 25d250 --s --a
 !roll 500d20 --nb --a
+!fate
+!fate +3
+!fate -2
 !flip
 !flip 40
 !pi
@@ -81,12 +110,12 @@ You rolled 11. Breakdown: (3, 2, 5, 5, 4, 1) - 9.
 You rolled 50. Breakdown: (2, 5, 2, 7, 3, 6) * 2.
 You rolled 115, with an average of 9.5833. Breakdown: (20, 18, 17, 14, 13, 8, 7, 6, 5, 5, 1, 1).
 You rolled 4827, with an average of 9.6540.
+You rolled -1. Breakdown: (0, 0, -, 0).
+You rolled 3. Breakdown: (-, 0, +, 0) + 3.
+You rolled -1. Breakdown: (+, 0, -, +) - 2.
 You got tails.
 You got 20 heads and 20 tails.
 With 1000 iterations, I approximated PI as 3.194383.
 With 4000 iterations, I approximated PI as 3.140759.
 ```
 
-## How am I approximating PI?
-
-The probability of two random numbers being coprime is 6/π<sup>2</sup> ([source](http://www.cut-the-knot.org/m/Probability/TwoCoprime.shtml)). Therefore, if we generate N pairs of random numbers, count how many of them are coprime, and do a little math, we can approximate PI. Cool, huh?
