@@ -28,9 +28,11 @@ You can specify how many and what kind of dice to using standard dice notation:
 
 In addition, you can use these flags:
 
-* `--nb`: no breakdown of your rolls is provided and increases the maximum number of dice you can roll at once to 1000
+* `--nb`: no breakdown of your rolls is provided and the maximum number of dice you can roll at once is increased to 1000
 
-* `--s`: sorts the breakdown of your results (descending)
+* `--s`: sorts the breakdown of the dice rolls (descending)
+
+* `--a`: calculates the average result of the dice rolls
 
 ### !flip 
 
