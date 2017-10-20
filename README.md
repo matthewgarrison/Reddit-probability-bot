@@ -127,7 +127,7 @@ You rolled 3. Breakdown: (-, 0, +, 0) + 3.
 You rolled -1. Breakdown: (+, 0, -, +) - 2.
 You got tails.
 You got 20 heads and 20 tails.
-With 1000 iterations, I approximated PI as 3.194383.
-With 4000 iterations, I approximated PI as 3.140759.
+With 1000 pairs, I approximated PI as 3.194383.
+With 4000 pairs, I approximated PI as 3.140759.
 ```
 
