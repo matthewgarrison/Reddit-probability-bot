@@ -42,6 +42,35 @@ def roll_dice(num_dice, num_sides, constant, constant_type, no_breakdown, sort, 
 		output += "."
 	return output + "\n\n"
 
+# Returns a string containing the results of the dice rolls.
+def fate_dice(num_dice, constant, constant_type, no_breakdown) :
+	if no_breakdown : num_dice = max(min(num_dice, 1000), 1)
+	else : num_dice = max(min(num_dice, 50), 1)
+	results = []
+	for i in range(num_dice) :
+		results.append(random.randint(-1, 1))
+	total = sum(results)
+	if constant_type == Constant.ADD : total += constant
+	elif constant_type == Constant.SUBTRACT : total -= constant
+	elif constant_type == Constant.MULTIPLY : total *= constant
+	output = "You rolled " + str(total) + "."
+	if not no_breakdown and num_dice != 1 :
+		output += " Breakdown: ("
+		for result in results[:-1] : output += fate_format(result) + ", "
+		output += fate_format(results[-1])
+		output += ")"
+		if constant_type == Constant.ADD : output += " + " + str(constant)
+		elif constant_type == Constant.SUBTRACT : output += " - " + str(constant)
+		elif constant_type == Constant.MULTIPLY : output += " * " + str(constant)
+		output += "."
+	return output + "\n\n"
+
+# Formats the fate dice rolls.
+def fate_format(result) :
+	if result == -1 : return "-"
+	elif result == 1 : return "+"
+	else : return "0"
+
 # Returns a string containing the results of the coin flips.
 def flip_coins(num_coins) :
 	num_coins = max(min(num_coins, 1000), 1)
@@ -137,6 +166,37 @@ for comment in reddit.inbox.unread(limit=None) :
 							elif words[i] == "--a" : average = True
 							i += 1
 					output += roll_dice(num_dice, num_sides, constant, constant_type, no_breakdown, sort, average)
+				elif words[0] == "!fate" :
+					num_dice = 4
+					constant = 0
+					constant_type = Constant.NONE
+					no_breakdown = False
+					if len(words) > 1 :
+						if re.fullmatch("\d+", words[1]) : 
+							# A
+							num_dice = int(words[1])
+						match = re.fullmatch("\d+(\+|-|\*)-?\d+", words[1])
+						if match :
+							# A(+|-|*)B
+							parts = re.split("[d+\-*]", words[1], maxsplit=2)
+							num_dice = int(parts[0])
+							constant = int(parts[1])
+							if match.group(1) == "+" : constant_type = Constant.ADD
+							elif match.group(1) == "-" : constant_type = Constant.SUBTRACT
+							elif match.group(1) == "*" : constant_type = Constant.MULTIPLY
+						match = re.fullmatch("(\+|-|\*)-?\d+", words[1])
+						if match :
+							# (+|-|*)B
+							parts = re.split("[+\-*]", words[1], maxsplit=1)
+							constant = int(parts[1])
+							if match.group(1) == "+" : constant_type = Constant.ADD
+							elif match.group(1) == "-" : constant_type = Constant.SUBTRACT
+							elif match.group(1) == "*" : constant_type = Constant.MULTIPLY
+						i = 1
+						while i < len(words) :
+							if words[i] == "--nb" : no_breakdown = True
+							i += 1
+					output += fate_dice(num_dice, constant, constant_type, no_breakdown)
 				elif words[0] == "!flip" :
 					num = 1
 					if len(words) > 1 and re.fullmatch("\d+", words[1]) : num = int(words[1])
