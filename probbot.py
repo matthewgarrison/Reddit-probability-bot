@@ -14,22 +14,6 @@ class Constant(Enum) :
 	SUBTRACT = 2
 	MULTIPLY = 3
 
-# Approximates PI using the fact that the probability of two random numbers being comprime is 6/PI^2.
-# Source: http://www.cut-the-knot.org/m/Probability/TwoCoprime.shtml
-def calc_pi(num_iterations) :
-	num_iterations = max(min(num_iterations, 100000), 100)
-	num_coprime = 0
-	for i in range(num_iterations) :
-		one = random.randrange(10000000)
-		two = random.randrange(10000000)
-		if GCD(one, two) == 1 : num_coprime += 1
-	prob_comprime = num_coprime / num_iterations
-	pi = math.sqrt(6 / prob_comprime)
-	return "With " + str(num_iterations) + " iterations, I approximated PI as " + "{:f}".format(pi) + ".\n\n"
-
-# Calcualtes the GCD of two numbers (using the Euclidean Algorithm).
-def GCD(a, b) :
-	return a if b == 0 else GCD(b, a % b)
 
 # Returns a string containing the results of the dice rolls.
 def roll_dice(num_dice, num_sides, constant, constant_type, no_breakdown, sort, average) :
@@ -69,6 +53,23 @@ def flip_coins(num_coins) :
 		return "You got " + ans + ".\n\n"
 	else : return "You got " + str(results.count(0)) + " heads and " + str(results.count(1)) + " tails.\n\n"
 	
+# Approximates PI using the fact that the probability of two random numbers being comprime is 6/PI^2.
+# Source: http://www.cut-the-knot.org/m/Probability/TwoCoprime.shtml
+def calc_pi(num_iterations) :
+	num_iterations = max(min(num_iterations, 100000), 100)
+	num_coprime = 0
+	for i in range(num_iterations) :
+		one = random.randrange(10000000)
+		two = random.randrange(10000000)
+		if GCD(one, two) == 1 : num_coprime += 1
+	prob_comprime = num_coprime / num_iterations
+	pi = math.sqrt(6 / prob_comprime)
+	return "With " + str(num_iterations) + " iterations, I approximated PI as " + "{:f}".format(pi) + ".\n\n"
+
+# Calcualtes the GCD of two numbers (using the Euclidean Algorithm).
+def GCD(a, b) :
+	return a if b == 0 else GCD(b, a % b)
+
 
 
 
@@ -99,8 +100,6 @@ for comment in reddit.inbox.unread(limit=None) :
 		try :
 			lines = comment.body.splitlines()
 			for line in lines :
-				# For each word in the line, we check if it matches one of the commands. If it does, 
-				# we also check the next word in case it contains a number.
 				words = re.split("\s+", line)
 				print(comment.id, words)
 				if words[0] == "!roll" :
