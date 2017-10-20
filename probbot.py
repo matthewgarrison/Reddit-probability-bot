@@ -22,23 +22,31 @@ class Discard(Enum) :
 
 # Returns a string containing the results of the dice rolls.
 def roll_dice(num_dice, num_sides, constant, constant_type, no_breakdown, sort, average, discard_count, discard_type) :
+	# Ensure num_dice and num_sides are within the valid range of values.
 	if no_breakdown : num_dice = max(min(num_dice, 1000), 1)
 	else : num_dice = max(min(num_dice, 50), 1)
 	num_sides = max(min(num_sides, 10000), 2)
+
+	# Roll the dice, total the results, and sort if necessary.
 	results = []
 	for i in range(num_dice) :
 		results.append(random.randint(1, num_sides))
 	if sort : results.sort(reverse=True)
 	total = sum(results)
+
+	# If we are discarding any dice, we'll create a list of what to discard.
 	if discard_type != Discard.NONE :
-		# Sort the list then remove all the dice we are keeping.
 		if discard_type == Discard.LOWEST : discarded_results = sorted(results, reverse=True)
 		else : discarded_results = sorted(results)
 		for i in range(num_dice - discard_count) : discarded_results.remove(discarded_results[0])
 		total -= sum(discarded_results)
+
+	# Apply the constant, if there is one.
 	if constant_type == Constant.ADD : total += constant
 	elif constant_type == Constant.SUBTRACT : total -= constant
 	elif constant_type == Constant.MULTIPLY : total *= constant
+
+	# Create the output string.
 	output = "You rolled " + str(total)
 	if average : output += ", with an average of " + "{:.4f}".format(total / num_dice)
 	output += "."
@@ -48,6 +56,8 @@ def roll_dice(num_dice, num_sides, constant, constant_type, no_breakdown, sort, 
 			for result in results[:-1] : output += str(result) + ", "
 			output += str(results[-1])
 		else :
+			# Check if the current result is being discarded. If so, strike it through and remove 
+			# it from the list of discarded rolls.
 			for result in results[:-1] :
 				if result in discarded_results :
 					output += "~~" + str(result) + "~~" + ", "
@@ -66,15 +76,22 @@ def roll_dice(num_dice, num_sides, constant, constant_type, no_breakdown, sort, 
 
 # Returns a string containing the results of the dice rolls.
 def fate_dice(num_dice, constant, constant_type, no_breakdown) :
+	# Ensure num_dice and num_sides are within the valid range of values.
 	if no_breakdown : num_dice = max(min(num_dice, 1000), 1)
 	else : num_dice = max(min(num_dice, 50), 1)
+
+	# Roll the dice and total the results.
 	results = []
 	for i in range(num_dice) :
 		results.append(random.randint(-1, 1))
 	total = sum(results)
+
+	# Apply the constant, if there is one.
 	if constant_type == Constant.ADD : total += constant
 	elif constant_type == Constant.SUBTRACT : total -= constant
 	elif constant_type == Constant.MULTIPLY : total *= constant
+
+	# Create the output string.
 	output = "You rolled " + str(total) + "."
 	if not no_breakdown and num_dice != 1 :
 		output += " Breakdown: ("
@@ -87,7 +104,7 @@ def fate_dice(num_dice, constant, constant_type, no_breakdown) :
 		output += "."
 	return output + "\n\n"
 
-# Formats the fate dice rolls.
+# Formats the Fate dice rolls.
 def fate_format(result) :
 	if result == -1 : return "-"
 	elif result == 1 : return "+"
@@ -106,16 +123,16 @@ def flip_coins(num_coins) :
 	
 # Approximates PI using the fact that the probability of two random numbers being comprime is 6/PI^2.
 # Source: http://www.cut-the-knot.org/m/Probability/TwoCoprime.shtml
-def calc_pi(num_iterations) :
-	num_iterations = max(min(num_iterations, 100000), 100)
+def calc_pi(num_pairs) :
+	num_pairs = max(min(num_pairs, 100000), 100)
 	num_coprime = 0
-	for i in range(num_iterations) :
+	for i in range(num_pairs) :
 		one = random.randrange(10000000)
 		two = random.randrange(10000000)
 		if GCD(one, two) == 1 : num_coprime += 1
-	prob_comprime = num_coprime / num_iterations
+	prob_comprime = num_coprime / num_pairs
 	pi = math.sqrt(6 / prob_comprime)
-	return "With " + str(num_iterations) + " iterations, I approximated PI as " + "{:f}".format(pi) + ".\n\n"
+	return "With " + str(num_pairs) + " pairs, I approximated PI as " + "{:f}".format(pi) + ".\n\n"
 
 # Calcualtes the GCD of two numbers (using the Euclidean Algorithm).
 def GCD(a, b) :
@@ -142,10 +159,12 @@ with open("banned_subreddits.txt", "r") as file :
 	banned_subreddits = list(filter(None, banned_subreddits))
 
 for comment in reddit.inbox.unread(limit=None) :
+	# Ignore the comment if it is in one of the banned subreddits.
 	subreddit = str(comment.subreddit)
 	if subreddit in banned_subreddits :
 		comment.mark_read()
 		continue
+
 	if re.search("/u/ProbabilityBot_", comment.body, re.IGNORECASE) :
 		output = ""
 		try :
@@ -163,19 +182,19 @@ for comment in reddit.inbox.unread(limit=None) :
 					no_breakdown = sort = average = False
 					if len(words) > 1 :
 						if re.fullmatch("\d+", words[1]) : 
-							# A
+							# X
 							num_dice = int(words[1])
 						elif re.fullmatch("d\d+", words[1]) : 
-							# dB
+							# dY
 							num_sides = int(words[1][1:])
 						elif re.fullmatch("\d+d\d+", words[1]) :
-							# AdB
+							# XdY
 							parts = words[1].split("d")
 							num_dice = int(parts[0])
 							num_sides = int(parts[1])
 						match = re.fullmatch("\d+d\d+(\+|-|\*)-?\d+", words[1])
 						if match :
-							# AdB(+|-|*)C 
+							# XdY(+|-|*)Z 
 							parts = re.split("[d+\-*]", words[1], maxsplit=2)
 							num_dice = int(parts[0])
 							num_sides = int(parts[1])
@@ -206,11 +225,11 @@ for comment in reddit.inbox.unread(limit=None) :
 					no_breakdown = False
 					if len(words) > 1 :
 						if re.fullmatch("\d+", words[1]) : 
-							# A
+							# X
 							num_dice = int(words[1])
 						match = re.fullmatch("\d+(\+|-|\*)-?\d+", words[1])
 						if match :
-							# A(+|-|*)B
+							# X(+|-|*)Y
 							parts = re.split("[d+\-*]", words[1], maxsplit=2)
 							num_dice = int(parts[0])
 							constant = int(parts[1])
@@ -219,7 +238,7 @@ for comment in reddit.inbox.unread(limit=None) :
 							elif match.group(1) == "*" : constant_type = Constant.MULTIPLY
 						match = re.fullmatch("(\+|-|\*)-?\d+", words[1])
 						if match :
-							# (+|-|*)B
+							# (+|-|*)Y
 							parts = re.split("[+\-*]", words[1], maxsplit=1)
 							constant = int(parts[1])
 							if match.group(1) == "+" : constant_type = Constant.ADD
