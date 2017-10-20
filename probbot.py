@@ -153,15 +153,15 @@ if RUNNING_ON_HEROKU : reddit = praw.Reddit(username=os.environ["REDDIT_USERNAME
 else : reddit = praw.Reddit("prob-bot")
 
 # Subreddits that do not like bots, that this bot will not comment in.
-with open("banned_subreddits.txt", "r") as file :
-	banned_subreddits = file.read()
-	banned_subreddits = banned_subreddits.split("\n")
-	banned_subreddits = list(filter(None, banned_subreddits))
+with open("anti_bot_subreddits.txt", "r") as file :
+	anti_bot_subreddits = file.read()
+	anti_bot_subreddits = anti_bot_subreddits.split("\n")
+	anti_bot_subreddits = list(filter(None, anti_bot_subreddits))
 
 for comment in reddit.inbox.unread(limit=None) :
 	# Ignore the comment if it is in one of the banned subreddits.
 	subreddit = str(comment.subreddit)
-	if subreddit in banned_subreddits :
+	if subreddit in anti_bot_subreddits :
 		comment.mark_read()
 		continue
 
