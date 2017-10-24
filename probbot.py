@@ -138,7 +138,9 @@ def calc_pi(num_pairs) :
 def GCD(a, b) :
 	return a if b == 0 else GCD(b, a % b)
 
-
+# Quotes the input, using markdown.
+def quote(input) :
+	return "> " + input + "\n\n"
 
 
 
@@ -174,6 +176,7 @@ for comment in reddit.inbox.unread(limit=None) :
 				# This allows you to summon the bot and perform a single command, in one line.
 				if re.fullmatch("/u/ProbabilityBot_", words[0], re.IGNORECASE) : del words[0]
 				print(comment.id, words)
+				if len(words) == 0 : continue;
 				if words[0] == "!roll" :
 					num_dice = 1
 					num_sides = 0
@@ -218,8 +221,8 @@ for comment in reddit.inbox.unread(limit=None) :
 								if i+1 < len(words) and re.fullmatch("\d+", words[i+1]) : 
 									discard_count = int(words[i+1])
 							i += 1
-					output += ( roll_dice(num_dice, num_sides, constant, constant_type, no_breakdown, 
-						sort, average, discard_count, discard_type) )
+					output += quote(line) + ( roll_dice(num_dice, num_sides, constant, constant_type, 
+						no_breakdown, sort, average, discard_count, discard_type) )
 				elif words[0] == "!fate" :
 					num_dice = 4
 					constant = 0
@@ -250,15 +253,15 @@ for comment in reddit.inbox.unread(limit=None) :
 						while i < len(words) :
 							if words[i] == "--nb" : no_breakdown = True
 							i += 1
-					output += fate_dice(num_dice, constant, constant_type, no_breakdown)
+					output += quote(line) + fate_dice(num_dice, constant, constant_type, no_breakdown)
 				elif words[0] == "!flip" :
 					num = 1
 					if len(words) > 1 and re.fullmatch("\d+", words[1]) : num = int(words[1])
-					output += flip_coins(num)
+					output += quote(line) + flip_coins(num)
 				elif words[0] == "!pi" :
 					num = 1000
 					if len(words) > 1 and re.fullmatch("\d+", words[1]) : num = int(words[1])
-					output += calc_pi(num)
+					output += quote(line) + calc_pi(num)
 				
 				
 			if output == "" :
