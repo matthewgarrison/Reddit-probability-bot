@@ -14,13 +14,36 @@ class Constant(Enum) :
 	SUBTRACT = 2
 	MULTIPLY = 3
 
+MIN_DICE = 1
+MIN_SIDES = 2
+MAX_DICE_WITH_BREAKDOWN = 50
+MAX_DICE_WITHOUT_BREAKDOWN = 1000
+MAX_SIDES = 10000
+MIN_COINS = 1
+MAX_COINS = 1000
+MIN_PAIRS = 100
+MAX_PAIRS = 100000
+CALC_PI_RAND_MAX = 10000000
+
 # Returns a string containing the results of the dice rolls.
 def roll_dice(num_dice, num_sides, constant, constant_type, no_breakdown, sort, average, 
 		discard_lowest, dl_count, discard_highest, dh_count) :
-	# Ensure num_dice and num_sides are within the valid range of values.
-	if no_breakdown : num_dice = max(min(num_dice, 1000), 1)
-	else : num_dice = max(min(num_dice, 50), 1)
-	num_sides = max(min(num_sides, 10000), 2)
+	output = ""
+	# Ensure num_dice and num_sides are within the valid range of values, and output a warning otherwise.
+	if no_breakdown : 
+		if num_dice > MAX_DICE_WITHOUT_BREAKDOWN or num_dice < MIN_DICE :
+			num_dice = max(min(num_dice, MAX_DICE_WITHOUT_BREAKDOWN), MIN_DICE)
+			output += ( "**Warning:** The number of dice you tried to roll is outside the range of [" + 
+					str(MIN_DICE) + ", " + str(MAX_DICE_WITHOUT_BREAKDOWN) + "].\n\n" )
+	else :
+		if num_dice > MAX_DICE_WITH_BREAKDOWN or num_dice < MIN_DICE :
+			num_dice = max(min(num_dice, MAX_DICE_WITH_BREAKDOWN), MIN_DICE)
+			output += ( "**Warning:** The number of dice you tried to roll is outside the range of [" + 
+					str(MIN_DICE) + ", " + str(MAX_DICE_WITH_BREAKDOWN) + "].\n\n" )
+	if num_sides > MAX_SIDES or num_sides < MIN_SIDES :
+		num_sides = max(min(num_sides, MAX_SIDES), MIN_SIDES)
+		output += ( "**Warning:** The number of sides you tried to use is outside the range of [" + 
+					str(MIN_SIDES) + ", " + str(MAX_SIDES) + "].\n\n" )
 
 	# Roll the dice, total the results, and sort if necessary.
 	results = []
@@ -49,7 +72,7 @@ def roll_dice(num_dice, num_sides, constant, constant_type, no_breakdown, sort, 
 	elif constant_type == Constant.MULTIPLY : total *= constant
 
 	# Create the output string.
-	output = "You rolled " + str(total)
+	output += "You rolled " + str(total)
 	if average : output += ", with an average of " + "{:.4f}".format(average_val)
 	output += "."
 	if not no_breakdown and num_dice != 1 :
@@ -77,9 +100,18 @@ def roll_dice(num_dice, num_sides, constant, constant_type, no_breakdown, sort, 
 
 # Returns a string containing the results of the dice rolls.
 def fate_dice(num_dice, constant, constant_type, no_breakdown) :
-	# Ensure num_dice and num_sides are within the valid range of values.
-	if no_breakdown : num_dice = max(min(num_dice, 1000), 1)
-	else : num_dice = max(min(num_dice, 50), 1)
+	output = ""
+	# Ensure num_dice is within the valid range of values, and output a warning otherwise.
+	if no_breakdown : 
+		if num_dice > MAX_DICE_WITHOUT_BREAKDOWN or num_dice < MIN_DICE :
+			num_dice = max(min(num_dice, MAX_DICE_WITHOUT_BREAKDOWN), MIN_DICE)
+			output += ( "**Warning:** The number of dice you tried to roll is outside the range of [" + 
+					str(MIN_DICE) + ", " + str(MAX_DICE_WITHOUT_BREAKDOWN) + "].\n\n" )
+	else :
+		if num_dice > MAX_DICE_WITH_BREAKDOWN or num_dice < MIN_DICE :
+			num_dice = max(min(num_dice, MAX_DICE_WITH_BREAKDOWN), MIN_DICE)
+			output += ( "**Warning:** The number of dice you tried to roll is outside the range of [" + 
+					str(MIN_DICE) + ", " + str(MAX_DICE_WITH_BREAKDOWN) + "].\n\n" )
 
 	# Roll the dice and total the results.
 	results = []
@@ -93,7 +125,7 @@ def fate_dice(num_dice, constant, constant_type, no_breakdown) :
 	elif constant_type == Constant.MULTIPLY : total *= constant
 
 	# Create the output string.
-	output = "You rolled " + str(total) + "."
+	output += "You rolled " + str(total) + "."
 	if not no_breakdown and num_dice != 1 :
 		output += " Breakdown: ("
 		for result in results[:-1] : output += fate_format(result) + ", "
@@ -113,27 +145,41 @@ def fate_format(result) :
 
 # Returns a string containing the results of the coin flips.
 def flip_coins(num_coins) :
-	num_coins = max(min(num_coins, 1000), 1)
+	output = ""
+	# Ensure num_coins is within the valid range of values, and output a warning otherwise.
+	if num_coins > MAX_COINS or num_coins < MIN_COINS :
+		num_coins = max(min(num_coins, MAX_COINS), MIN_COINS)
+		output += ( "**Warning:** The number of coins you tried to use is outside the range of [" + 
+					str(MIN_COINS) + ", " + str(MAX_COINS) + "].\n\n" )
+	
 	results = []
 	for i in range(num_coins) :
 		results.append(random.randint(0, 1))
 	if num_coins == 1 :
 		ans = ("heads" if results[0] == 0 else "tails")
-		return "You got " + ans + ".\n\n"
-	else : return "You got " + str(results.count(0)) + " heads and " + str(results.count(1)) + " tails.\n\n"
+		output += "You got " + ans + ".\n\n"
+	else : output += "You got " + str(results.count(0)) + " heads and " + str(results.count(1)) + " tails.\n\n"
+	return output
 	
 # Approximates PI using the fact that the probability of two random numbers being comprime is 6/PI^2.
 # Source: http://www.cut-the-knot.org/m/Probability/TwoCoprime.shtml
 def calc_pi(num_pairs) :
-	num_pairs = max(min(num_pairs, 100000), 100)
+	output = ""
+	# Ensure num_pairs is within the valid range of values, and output a warning otherwise.
+	if num_pairs > MAX_PAIRS or num_pairs < MIN_PAIRS :
+		num_pairs = max(min(num_pairs, MAX_PAIRS), MIN_PAIRS)
+		output += ( "**Warning:** The number of pairs you tried to use is outside the range of [" + 
+					str(MIN_PAIRS) + ", " + str(MAX_PAIRS) + "].\n\n" )
+	
 	num_coprime = 0
 	for i in range(num_pairs) :
-		one = random.randrange(10000000)
-		two = random.randrange(10000000)
+		one = random.randrange(CALC_PI_RAND_MAX)
+		two = random.randrange(CALC_PI_RAND_MAX)
 		if GCD(one, two) == 1 : num_coprime += 1
 	prob_comprime = num_coprime / num_pairs
 	pi = math.sqrt(6 / prob_comprime)
-	return "With " + str(num_pairs) + " pairs, I approximated PI as " + "{:f}".format(pi) + ".\n\n"
+	output += "With " + str(num_pairs) + " pairs, I approximated PI as " + "{:f}".format(pi) + ".\n\n"
+	return output
 
 # Calcualtes the GCD of two numbers (using the Euclidean Algorithm).
 def GCD(a, b) :
@@ -180,7 +226,7 @@ for comment in reddit.inbox.unread(limit=None) :
 				if len(words) == 0 : continue;
 				if words[0] == "!roll" :
 					num_dice = 1
-					num_sides = 0
+					num_sides = 6
 					constant = 0
 					constant_type = Constant.NONE
 					dh_count = dl_count = 1
@@ -190,6 +236,7 @@ for comment in reddit.inbox.unread(limit=None) :
 						if re.fullmatch("\d+", words[1]) : 
 							# X
 							num_dice = int(words[1])
+
 						elif re.fullmatch("d\d+", words[1]) : 
 							# dY
 							num_sides = int(words[1][1:])
@@ -222,8 +269,13 @@ for comment in reddit.inbox.unread(limit=None) :
 								if i+1 < len(words) and re.fullmatch("\d+", words[i+1]) : 
 									dh_count = int(words[i+1])
 							i += 1
-					output += quote(line) + ( roll_dice(num_dice, num_sides, constant, constant_type, 
-						no_breakdown, sort, average, discard_lowest, dl_count, discard_highest, dh_count) )
+					output += quote(line)
+					if discard_lowest or discard_highest :
+						discard_total = (dl_count if discard_lowest else 0) + (dh_count if discard_highest else 0)
+						if discard_total > num_dice :
+							output += "**Warning:** You are discarding more dice than you are rolling.\n\n"
+					output += ( roll_dice(num_dice, num_sides, constant, constant_type, no_breakdown, 
+							sort, average, discard_lowest, dl_count, discard_highest, dh_count) )
 				elif words[0] == "!fate" :
 					num_dice = 4
 					constant = 0
