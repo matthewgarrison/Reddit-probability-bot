@@ -34,6 +34,8 @@ def roll_dice(num_dice, num_sides, constant, constant_type, no_breakdown, sort, 
 	if sort : results.sort(reverse=True)
 	total = sum(results)
 
+	average_val = total / num_dice
+
 	# If we are discarding any dice, we'll create a list of what to discard.
 	if discard_type != Discard.NONE :
 		if discard_type == Discard.LOWEST : discarded_results = sorted(results, reverse=True)
@@ -48,7 +50,7 @@ def roll_dice(num_dice, num_sides, constant, constant_type, no_breakdown, sort, 
 
 	# Create the output string.
 	output = "You rolled " + str(total)
-	if average : output += ", with an average of " + "{:.4f}".format(total / num_dice)
+	if average : output += ", with an average of " + "{:.4f}".format(average_val)
 	output += "."
 	if not no_breakdown and num_dice != 1 :
 		output += " Breakdown: ("
