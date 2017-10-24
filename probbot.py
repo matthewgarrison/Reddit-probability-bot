@@ -52,8 +52,6 @@ def roll_dice(num_dice, num_sides, constant, constant_type, no_breakdown, sort, 
 	if sort : results.sort(reverse=True)
 	total = sum(results)
 
-	average_val = total / num_dice
-
 	# If we are discarding any dice, we'll create a list of what to discard.
 	discarded_lowest_results = []
 	discarded_highest_results = []
@@ -65,6 +63,8 @@ def roll_dice(num_dice, num_sides, constant, constant_type, no_breakdown, sort, 
 		discarded_highest_results = sorted(results)
 		for i in range(num_dice - dh_count) : discarded_highest_results.remove(discarded_highest_results[0])
 		total -= sum(discarded_highest_results)
+
+	average_val = total / (num_dice - dl_count - dh_count)
 
 	# Apply the constant, if there is one.
 	if constant_type == Constant.ADD : total += constant
@@ -229,7 +229,7 @@ for comment in reddit.inbox.unread(limit=None) :
 					num_sides = 6
 					constant = 0
 					constant_type = Constant.NONE
-					dh_count = dl_count = 1
+					dh_count = dl_count = 0
 					discard_highest = discard_lowest = False
 					no_breakdown = sort = average = False
 					if len(words) > 1 :
@@ -262,10 +262,12 @@ for comment in reddit.inbox.unread(limit=None) :
 							elif words[i] == "--a" : average = True
 							elif words[i] == "--dl" :
 								discard_lowest = True
+								dl_count = 1
 								if i+1 < len(words) and re.fullmatch("\d+", words[i+1]) : 
 									dl_count = int(words[i+1])
 							elif words[i] == "--dh" :
 								discard_highest = True
+								dh_count = 1
 								if i+1 < len(words) and re.fullmatch("\d+", words[i+1]) : 
 									dh_count = int(words[i+1])
 							i += 1
