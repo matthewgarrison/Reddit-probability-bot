@@ -14,14 +14,9 @@ class Constant(Enum) :
 	SUBTRACT = 2
 	MULTIPLY = 3
 
-class Discard(Enum) :
-	NONE = 0
-	LOWEST = 1
-	HIGHEST = 2
-
-
 # Returns a string containing the results of the dice rolls.
-def roll_dice(num_dice, num_sides, constant, constant_type, no_breakdown, sort, average, discard_count, discard_type) :
+def roll_dice(num_dice, num_sides, constant, constant_type, no_breakdown, sort, average, 
+		discard_lowest, dl_count, discard_highest, dh_count) :
 	# Ensure num_dice and num_sides are within the valid range of values.
 	if no_breakdown : num_dice = max(min(num_dice, 1000), 1)
 	else : num_dice = max(min(num_dice, 50), 1)
@@ -37,11 +32,16 @@ def roll_dice(num_dice, num_sides, constant, constant_type, no_breakdown, sort, 
 	average_val = total / num_dice
 
 	# If we are discarding any dice, we'll create a list of what to discard.
-	if discard_type != Discard.NONE :
-		if discard_type == Discard.LOWEST : discarded_results = sorted(results, reverse=True)
-		else : discarded_results = sorted(results)
-		for i in range(num_dice - discard_count) : discarded_results.remove(discarded_results[0])
-		total -= sum(discarded_results)
+	discarded_lowest_results = []
+	discarded_highest_results = []
+	if discard_lowest :
+		discarded_lowest_results = sorted(results, reverse=True)
+		for i in range(num_dice - dl_count) : discarded_lowest_results.remove(discarded_lowest_results[0])
+		total -= sum(discarded_lowest_results)
+	if discard_highest :
+		discarded_highest_results = sorted(results)
+		for i in range(num_dice - dh_count) : discarded_highest_results.remove(discarded_highest_results[0])
+		total -= sum(discarded_highest_results)
 
 	# Apply the constant, if there is one.
 	if constant_type == Constant.ADD : total += constant
@@ -54,21 +54,20 @@ def roll_dice(num_dice, num_sides, constant, constant_type, no_breakdown, sort, 
 	output += "."
 	if not no_breakdown and num_dice != 1 :
 		output += " Breakdown: ("
-		if discard_type == Discard.NONE :
+		if not discard_lowest and not discard_highest :
 			for result in results[:-1] : output += str(result) + ", "
 			output += str(results[-1])
 		else :
 			# Check if the current result is being discarded. If so, strike it through and remove 
 			# it from the list of discarded rolls.
-			for result in results[:-1] :
-				if result in discarded_results :
-					output += "~~" + str(result) + "~~" + ", "
-					discarded_results.remove(result)
-				else : output += str(result) + ", "
-			if results[-1] in discarded_results :
-				output += "~~" + str(results[-1]) + "~~"
-				discarded_results.remove(results[-1])
-			else : output += str(results[-1])
+			for i in range(num_dice) :
+				if results[i] in discarded_lowest_results :
+					output += "~~" + str(results[i]) + "~~" + (", " if i != num_dice-1 else "")
+					discarded_lowest_results.remove(results[i])
+				elif results[i] in discarded_highest_results :
+					output += "~~" + str(results[i]) + "~~" + (", " if i != num_dice-1 else "")
+					discarded_highest_results.remove(results[i])
+				else : output += str(results[i]) + (", " if i != num_dice-1 else "")
 		output += ")"
 		if constant_type == Constant.ADD : output += " + " + str(constant)
 		elif constant_type == Constant.SUBTRACT : output += " - " + str(constant)
@@ -184,8 +183,8 @@ for comment in reddit.inbox.unread(limit=None) :
 					num_sides = 0
 					constant = 0
 					constant_type = Constant.NONE
-					discard_count = 1
-					discard_type = Discard.NONE
+					dh_count = dl_count = 1
+					discard_highest = discard_lowest = False
 					no_breakdown = sort = average = False
 					if len(words) > 1 :
 						if re.fullmatch("\d+", words[1]) : 
@@ -215,16 +214,16 @@ for comment in reddit.inbox.unread(limit=None) :
 							elif words[i] == "--s" : sort = True
 							elif words[i] == "--a" : average = True
 							elif words[i] == "--dl" :
-								discard_type = Discard.LOWEST
+								discard_lowest = True
 								if i+1 < len(words) and re.fullmatch("\d+", words[i+1]) : 
-									discard_count = int(words[i+1])
+									dl_count = int(words[i+1])
 							elif words[i] == "--dh" :
-								discard_type = Discard.HIGHEST
+								discard_highest = True
 								if i+1 < len(words) and re.fullmatch("\d+", words[i+1]) : 
-									discard_count = int(words[i+1])
+									dh_count = int(words[i+1])
 							i += 1
 					output += quote(line) + ( roll_dice(num_dice, num_sides, constant, constant_type, 
-						no_breakdown, sort, average, discard_count, discard_type) )
+						no_breakdown, sort, average, discard_lowest, dl_count, discard_highest, dh_count) )
 				elif words[0] == "!fate" :
 					num_dice = 4
 					constant = 0
