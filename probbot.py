@@ -171,6 +171,8 @@ for comment in reddit.inbox.unread(limit=None) :
 			lines = comment.body.splitlines()
 			for line in lines :
 				words = re.split("\s+", line)
+				# This allows you to summon the bot and perform a single command, in one line.
+				if re.fullmatch("/u/ProbabilityBot_", words[0], re.IGNORECASE) : del words[0]
 				print(comment.id, words)
 				if words[0] == "!roll" :
 					num_dice = 1
