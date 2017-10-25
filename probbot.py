@@ -14,6 +14,12 @@ class Constant(Enum) :
 	SUBTRACT = 2
 	MULTIPLY = 3
 
+class Direction(Enum) :
+	NONE = 0
+	LOWER = 1
+	EQUAL = 2
+	HIGHER = 3
+
 MIN_DICE = 1
 MIN_SIDES = 2
 MAX_DICE_WITH_BREAKDOWN = 50
@@ -27,7 +33,7 @@ CALC_PI_RAND_MAX = 10000000
 
 # Returns a string containing the results of the dice rolls.
 def roll_dice(num_dice, num_sides, constant, constant_type, no_breakdown, sort, average, 
-		discard_lowest, dl_count, discard_highest, dh_count) :
+		discard_lowest, dl_count, discard_highest, dh_count, target_direction, target_val) :
 	output = ""
 	# Ensure num_dice and num_sides are within the valid range of values, and output a warning otherwise.
 	if no_breakdown : 
@@ -66,6 +72,11 @@ def roll_dice(num_dice, num_sides, constant, constant_type, no_breakdown, sort, 
 
 	average_val = total / (num_dice - dl_count - dh_count)
 
+	# Apply the target flag.
+	if target_direction != Direction.NONE :
+		total = ( count_elements(results, target_val, target_direction) - count_elements(discarded_lowest_results, 
+			target_val, target_direction) - count_elements(discarded_highest_results, target_val, target_direction) )
+
 	# Apply the constant, if there is one.
 	if constant_type == Constant.ADD : total += constant
 	elif constant_type == Constant.SUBTRACT : total -= constant
@@ -77,7 +88,7 @@ def roll_dice(num_dice, num_sides, constant, constant_type, no_breakdown, sort, 
 	output += "."
 	if not no_breakdown and num_dice != 1 :
 		output += " Breakdown: ("
-		if not discard_lowest and not discard_highest :
+		if not discard_lowest and not discard_highest and target_direction == Direction.NONE :
 			for result in results[:-1] : output += str(result) + ", "
 			output += str(results[-1])
 		else :
@@ -85,18 +96,33 @@ def roll_dice(num_dice, num_sides, constant, constant_type, no_breakdown, sort, 
 			# it from the list of discarded rolls.
 			for i in range(num_dice) :
 				if results[i] in discarded_lowest_results :
-					output += "~~" + str(results[i]) + "~~" + (", " if i != num_dice-1 else "")
+					output += "~~" + str(results[i]) + "~~"
 					discarded_lowest_results.remove(results[i])
 				elif results[i] in discarded_highest_results :
-					output += "~~" + str(results[i]) + "~~" + (", " if i != num_dice-1 else "")
+					output += "~~" + str(results[i]) + "~~"
 					discarded_highest_results.remove(results[i])
-				else : output += str(results[i]) + (", " if i != num_dice-1 else "")
+				elif is_target(results[i], target_val, target_direction) :
+					output += "**" + str(results[i]) + "**"
+				else : output += str(results[i])
+				output += (", " if i != num_dice-1 else "")
 		output += ")"
 		if constant_type == Constant.ADD : output += " + " + str(constant)
 		elif constant_type == Constant.SUBTRACT : output += " - " + str(constant)
 		elif constant_type == Constant.MULTIPLY : output += " * " + str(constant)
 		output += "."
 	return output + "\n\n"
+
+def count_elements(list, target_val, direction) :
+	count = 0
+	for val in list :
+		if is_target(val, target_val, direction) : count += 1
+	return count
+
+def is_target(val, target_val, direction) :
+	if direction == Direction.LOWER and val < target_val : return True
+	elif direction == Direction.EQUAL and val == target_val : return True
+	elif direction == Direction.HIGHER and val > target_val : return True
+	return False
 
 # Returns a string containing the results of the dice rolls.
 def fate_dice(num_dice, constant, constant_type, no_breakdown) :
@@ -231,12 +257,13 @@ for comment in reddit.inbox.unread(limit=None) :
 					constant_type = Constant.NONE
 					dh_count = dl_count = 0
 					discard_highest = discard_lowest = False
+					target_direction = Direction.NONE
+					target_val = 0
 					no_breakdown = sort = average = False
 					if len(words) > 1 :
 						if re.fullmatch("\d+", words[1]) : 
 							# X
 							num_dice = int(words[1])
-
 						elif re.fullmatch("d\d+", words[1]) : 
 							# dY
 							num_sides = int(words[1][1:])
@@ -270,6 +297,18 @@ for comment in reddit.inbox.unread(limit=None) :
 								dh_count = 1
 								if i+1 < len(words) and re.fullmatch("\d+", words[i+1]) : 
 									dh_count = int(words[i+1])
+							elif words[i] == "--tl" :
+								target_direction = Direction.LOWER
+								if i+1 < len(words) and re.fullmatch("\d+", words[i+1]) : 
+									target_val = int(words[i+1])
+							elif words[i] == "--te" :
+								target_direction = Direction.EQUAL
+								if i+1 < len(words) and re.fullmatch("\d+", words[i+1]) : 
+									target_val = int(words[i+1])
+							elif words[i] == "--th" :
+								target_direction = Direction.HIGHER
+								if i+1 < len(words) and re.fullmatch("\d+", words[i+1]) : 
+									target_val = int(words[i+1])
 							i += 1
 					output += quote(line)
 					if discard_lowest or discard_highest :
@@ -277,7 +316,8 @@ for comment in reddit.inbox.unread(limit=None) :
 						if discard_total > num_dice :
 							output += "**Warning:** You are discarding more dice than you are rolling.\n\n"
 					output += ( roll_dice(num_dice, num_sides, constant, constant_type, no_breakdown, 
-							sort, average, discard_lowest, dl_count, discard_highest, dh_count) )
+							sort, average, discard_lowest, dl_count, discard_highest, dh_count, 
+							target_direction, target_val) )
 				elif words[0] == "!fate" :
 					num_dice = 4
 					constant = 0
