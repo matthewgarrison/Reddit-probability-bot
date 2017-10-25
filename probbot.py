@@ -33,7 +33,8 @@ CALC_PI_RAND_MAX = 10000000
 
 # Returns a string containing the results of the dice rolls.
 def roll_dice(num_dice, num_sides, constant, constant_type, no_breakdown, sort, average, 
-		discard_lowest, dl_count, discard_highest, dh_count, target_direction, target_val) :
+		discard_lowest, dl_count, discard_highest, dh_count, target_direction, target_val, 
+		explode_direction, explode_val, reroll_direction, reroll_val) :
 	output = ""
 	# Ensure num_dice and num_sides are within the valid range of values, and output a warning otherwise.
 	if no_breakdown : 
@@ -51,22 +52,38 @@ def roll_dice(num_dice, num_sides, constant, constant_type, no_breakdown, sort, 
 		output += ( "**Warning:** The number of sides you tried to use is outside the range of [" + 
 					str(MIN_SIDES) + ", " + str(MAX_SIDES) + "].\n\n" )
 
-	# Roll the dice, total the results, and sort if necessary.
+	# Roll the dice, total the results, and sort if necessary. When exploding/rerolling, the total 
+	# number of dice rolled will not exceed MAX_DICE.
 	results = []
-	for i in range(num_dice) :
-		results.append(random.randint(1, num_sides))
+	rerolled_results = []
+	i = j = 0
+	while i < num_dice :
+		if j >= (MAX_DICE_WITHOUT_BREAKDOWN if no_breakdown else MAX_DICE_WITH_BREAKDOWN) : break
+		val = random.randint(1, num_sides)
+		if is_target(val, explode_val, explode_direction) : 
+			i -= 1
+		elif is_target(val, reroll_val, reroll_direction) :
+			rerolled_results.append(val)
+			i -= 1
+		results.append(val)
+		i += 1
+		j += 1
+		print(val, i, j)
 	if sort : results.sort(reverse=True)
-	total = sum(results)
+	total = sum(results) - sum(rerolled_results)
+
+	num_dice = len(results) - len(rerolled_results)
 
 	# If we are discarding any dice, we'll create a list of what to discard.
 	discarded_lowest_results = []
 	discarded_highest_results = []
 	if discard_lowest :
-		discarded_lowest_results = sorted(results, reverse=True)
+		discarded_lowest_results = sorted([x for x in results if x not in rerolled_results], reverse=True)
 		for i in range(num_dice - dl_count) : discarded_lowest_results.remove(discarded_lowest_results[0])
 		total -= sum(discarded_lowest_results)
 	if discard_highest :
-		discarded_highest_results = sorted(results)
+		discarded_highest_results = sorted([x for x in results if x not in rerolled_results])
+		print(reroll_val, reroll_direction, num_dice, dh_count, discarded_highest_results, results, rerolled_results)
 		for i in range(num_dice - dh_count) : discarded_highest_results.remove(discarded_highest_results[0])
 		total -= sum(discarded_highest_results)
 
@@ -94,8 +111,11 @@ def roll_dice(num_dice, num_sides, constant, constant_type, no_breakdown, sort, 
 		else :
 			# Check if the current result is being discarded. If so, strike it through and remove 
 			# it from the list of discarded rolls.
-			for i in range(num_dice) :
-				if results[i] in discarded_lowest_results :
+			for i in range(len(results)) :
+				if results[i] in rerolled_results :
+					output += "~~" + str(results[i]) + "~~"
+					rerolled_results.remove(results[i])
+				elif results[i] in discarded_lowest_results :
 					output += "~~" + str(results[i]) + "~~"
 					discarded_lowest_results.remove(results[i])
 				elif results[i] in discarded_highest_results :
@@ -104,7 +124,7 @@ def roll_dice(num_dice, num_sides, constant, constant_type, no_breakdown, sort, 
 				elif is_target(results[i], target_val, target_direction) :
 					output += "**" + str(results[i]) + "**"
 				else : output += str(results[i])
-				output += (", " if i != num_dice-1 else "")
+				output += (", " if i != len(results)-1 else "")
 		output += ")"
 		if constant_type == Constant.ADD : output += " + " + str(constant)
 		elif constant_type == Constant.SUBTRACT : output += " - " + str(constant)
@@ -260,6 +280,10 @@ for comment in reddit.inbox.unread(limit=None) :
 					target_direction = Direction.NONE
 					target_val = 0
 					no_breakdown = sort = average = False
+					explode_val = 0
+					explode_direction = Direction.NONE
+					reroll_val = 1
+					reroll_direction = Direction.NONE
 					if len(words) > 1 :
 						if re.fullmatch("\d+", words[1]) : 
 							# X
@@ -283,10 +307,13 @@ for comment in reddit.inbox.unread(limit=None) :
 							elif match.group(1) == "-" : constant_type = Constant.SUBTRACT
 							elif match.group(1) == "*" : constant_type = Constant.MULTIPLY
 						i = 1
+						explode_val = num_dice
 						while i < len(words) :
+							# No breakdown, sort, and average flags.
 							if words[i] == "--nb" : no_breakdown = True
 							elif words[i] == "--s" : sort = True
 							elif words[i] == "--a" : average = True
+							# Discard rolls.
 							elif words[i] == "--dl" :
 								discard_lowest = True
 								dl_count = 1
@@ -297,6 +324,7 @@ for comment in reddit.inbox.unread(limit=None) :
 								dh_count = 1
 								if i+1 < len(words) and re.fullmatch("\d+", words[i+1]) : 
 									dh_count = int(words[i+1])
+							# Set a target roll.
 							elif words[i] == "--tl" :
 								target_direction = Direction.LOWER
 								if i+1 < len(words) and re.fullmatch("\d+", words[i+1]) : 
@@ -309,6 +337,32 @@ for comment in reddit.inbox.unread(limit=None) :
 								target_direction = Direction.HIGHER
 								if i+1 < len(words) and re.fullmatch("\d+", words[i+1]) : 
 									target_val = int(words[i+1])
+							# Set exploding rolls
+							elif words[i] == "--el" :
+								explode_direction = Direction.LOWER
+								if i+1 < len(words) and re.fullmatch("\d+", words[i+1]) : 
+									explode_val = int(words[i+1])
+							elif words[i] == "--ee" :
+								explode_direction = Direction.EQUAL
+								if i+1 < len(words) and re.fullmatch("\d+", words[i+1]) : 
+									explode_val = int(words[i+1])
+							elif words[i] == "--eh" :
+								explode_direction = Direction.HIGHER
+								if i+1 < len(words) and re.fullmatch("\d+", words[i+1]) : 
+									explode_val = int(words[i+1])
+							# Set a reroll target.
+							elif words[i] == "--rl" :
+								reroll_direction = Direction.LOWER
+								if i+1 < len(words) and re.fullmatch("\d+", words[i+1]) : 
+									reroll_val = int(words[i+1])
+							elif words[i] == "--re" :
+								reroll_direction = Direction.EQUAL
+								if i+1 < len(words) and re.fullmatch("\d+", words[i+1]) : 
+									reroll_val = int(words[i+1])
+							elif words[i] == "--rh" :
+								reroll_direction = Direction.HIGHER
+								if i+1 < len(words) and re.fullmatch("\d+", words[i+1]) : 
+									reroll_val = int(words[i+1])
 							i += 1
 					output += quote(line)
 					if discard_lowest or discard_highest :
@@ -317,7 +371,8 @@ for comment in reddit.inbox.unread(limit=None) :
 							output += "**Warning:** You are discarding more dice than you are rolling.\n\n"
 					output += ( roll_dice(num_dice, num_sides, constant, constant_type, no_breakdown, 
 							sort, average, discard_lowest, dl_count, discard_highest, dh_count, 
-							target_direction, target_val) )
+							target_direction, target_val, explode_direction, explode_val, reroll_direction, 
+							reroll_val) )
 				elif words[0] == "!fate" :
 					num_dice = 4
 					constant = 0
