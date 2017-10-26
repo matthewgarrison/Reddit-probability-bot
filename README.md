@@ -42,6 +42,24 @@ In addition, you can use these flags:
 
 * `--dh N`: discards the highest `N` rolls
 
+* `--tl N`: instead of summing the rolls, it counts the number of rolls lower than N (ie. target sum)
+
+* `--te N`: instead of summing the rolls, it counts the number of rolls equal to N
+
+* `--th N`: instead of summing the rolls, it counts the number of rolls higher than N
+
+* `--el N`: if a roll is lower than N, it is rerolled, and the previous roll is kept (ie. exploding rolls)
+
+* `--ee N`: if a roll is equal to N, it is rerolled, and the previous roll is kept
+
+* `--eh N`: if a roll is higher than N, it is rerolled, and the previous roll is kept
+
+* `--rl N`: if a roll is lower than N, it is rerolled, and the previous roll is discarded (ie. rerolls)
+
+* `--rl N`: if a roll is eqyal to N, it is rerolled, and the previous roll is discarded
+
+* `--rl N`: if a roll is higher than N, it is rerolled, and the previous roll is discarded
+
 ### !fate
 
 Rolls [Fate](https://en.wikipedia.org/wiki/Fudge_(role-playing_game_system)#Fudge_dice) (or Fudge) dice. By default, it rolls 4 dice.
@@ -84,6 +102,14 @@ Approximates pi. The probability of two random numbers being coprime is 6/π<sup
 
 * `N`: use `N` pairs of random numbers
 
+## Formatting
+
+If a roll is discarded, it is struck-through: ~~5~~
+
+If a roll matches the target, it is bolded: **5**
+
+If a roll rerolled, it has inline code formatting: `5`
+
 ## Examples
 
 If you commented: 
@@ -109,7 +135,7 @@ If you commented:
 !pi 4000
 ```
 
-You would get a reply like (where `~` represented strike-throughs):
+You would get a reply like:
 
 ```
 You rolled 1.
