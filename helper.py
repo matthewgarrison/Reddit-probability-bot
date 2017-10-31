@@ -86,7 +86,7 @@ def roll_dice(num_dice, num_sides, constant, constant_type, no_breakdown, sort, 
 		for i in range(num_dice - dh_count) : discarded_highest_results.remove(discarded_highest_results[0])
 		total -= sum(discarded_highest_results)
 
-	average_val = total / (num_dice - dl_count - dh_count)
+	average_val = total / (len(results) - dl_count - dh_count - len(rerolled_results))
 
 	# Apply the target flag.
 	if target_direction != Direction.NONE :
@@ -104,7 +104,8 @@ def roll_dice(num_dice, num_sides, constant, constant_type, no_breakdown, sort, 
 	output += "."
 	if not no_breakdown and num_dice != 1 :
 		output += " Breakdown: ("
-		if not discard_lowest and not discard_highest and target_direction == Direction.NONE :
+		if ( not discard_lowest and not discard_highest and target_direction == Direction.NONE and 
+				reroll_direction == Direction.NONE and explode_direction == Direction.NONE ) :
 			for result in results[:-1] : output += str(result) + ", "
 			output += str(results[-1])
 		else :
@@ -122,6 +123,8 @@ def roll_dice(num_dice, num_sides, constant, constant_type, no_breakdown, sort, 
 					discarded_highest_results.remove(results[i])
 				elif is_target(results[i], target_val, target_direction) :
 					output += "**" + str(results[i]) + "**"
+				elif is_target(results[i], explode_val, explode_direction) :
+					output += "*" + str(results[i]) + "*"
 				else : output += str(results[i])
 				output += (", " if i != len(results)-1 else "")
 		output += ")"

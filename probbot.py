@@ -149,6 +149,13 @@ for comment in reddit.inbox.unread(limit=None) :
 						if discard_total > num_dice :
 							output += ( "**Warning:** You are discarding more dice than you are rolling. This will " +
 								"lead to undefined behavior.\n\n" )
+					if explode_direction != Direction.NONE and reroll_direction != Direction.NONE :
+						if ( (explode_direction == Direction.LOWER and explode_val > reroll_val) or
+								(explode_direction == Direction.LOWER and explode_val > reroll_val) or
+								(explode_direction == Direction.LOWER and explode_val > reroll_val) or
+								(explode_direction == Direction.LOWER and explode_val > reroll_val) ) :
+							output += ( "**Warning:** Your explode and reroll ranges overlap. This will " +
+								"lead to undefined behavior.\n\n" )
 					output += ( helper.roll_dice(num_dice, num_sides, constant, constant_type, no_breakdown, 
 							sort, average, discard_lowest, dl_count, discard_highest, dh_count, 
 							target_direction, target_val, explode_direction, explode_val, reroll_direction, 
