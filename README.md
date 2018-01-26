@@ -58,7 +58,7 @@ In addition, you can use these flags:
 
 * `--rl N`: if a roll is lower than N, it is rerolled, and the previous roll is discarded (ie. rerolls)
 
-* `--rl N`: if a roll is eqyal to N, it is rerolled, and the previous roll is discarded
+* `--rl N`: if a roll is equal to N, it is rerolled, and the previous roll is discarded
 
 * `--rl N`: if a roll is higher than N, it is rerolled, and the previous roll is discarded
 
