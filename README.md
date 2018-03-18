@@ -6,6 +6,8 @@ A bot built in Python that performs basic probability tasks, such as rolling dic
 
 You must first call the bot with `/u/ProbabilityBot_`, and then use one (or multiple) of the following commands. You can only have one command per line, and it must be at the beginning of the line.
 
+If you want to play around with this bot, I'd recommend making a thread in /r/test, which is designed for testing things like Reddit bots.
+
 ### !roll
 
 This command rolls one or more dice, and provides a breakdown of what you rolled. By default, it rolls a single 6-sided die. The maximum number of dice you can roll at once is 50 and the maximum number of sides a given die can have is 10000.
@@ -56,7 +58,7 @@ In addition, you can use these flags:
 
 * `--rl N`: if a roll is lower than N, it is rerolled, and the previous roll is discarded (ie. rerolls)
 
-* `--rl N`: if a roll is eqyal to N, it is rerolled, and the previous roll is discarded
+* `--rl N`: if a roll is equal to N, it is rerolled, and the previous roll is discarded
 
 * `--rl N`: if a roll is higher than N, it is rerolled, and the previous roll is discarded
 
