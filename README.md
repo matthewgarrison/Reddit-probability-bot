@@ -1,5 +1,7 @@
 # Reddit Probability Bot
 
+**Update:** [Heroku's free tier has been discontinued](https://blog.heroku.com/next-chapter), so the bot is no longer hosted.
+
 A bot built in Python that performs basic probability tasks, such as rolling dice or flipping coins. You can view the bot [here](https://www.reddit.com/user/ProbabilityBot_).
 
 ## Usage
